@@ -1,0 +1,174 @@
+
+
+1、创建一个用户
+	# useradd  stack
+	# passwd   stack
+	# su  - stack                 //使用stack用户安装
+		注：不用输入密码，使用sudo
+			# echo “stack ALL=(root)	NOPASSWD:ALL”  | tee  -a /etc/sudoers.d/stack
+			# chmod  0400  /etc/suders.d/stack 
+
+2、使用系统图像和镜像创建云端环境
+	$ mkdir ~/images
+	$ mkdir ~/templates
+			
+3、设置hostname
+	检查hostname：
+		$ hostname                 //check the base hostname 
+		$ hostname -f              //check the long hostname
+	设置hostname：
+		$ sudo hostnamectl  set-hostname  manager.example.com
+		$ sudo hostnamectl  set-hostname  --transient  manager.example.com
+		$ vim /etc/hosts
+			127.0.0.1   manager.example.com manager localhost localhost.localdomain localhost4 localhost4.localdomain4
+			
+			
+4、注册系统
+	1、注册账户
+		$ sudo subscription-manager  register
+	2、查找权利池的ID
+		$ sudo subscription-manager list --available --all --matches="*OpenStack*"
+	3、附加本地PoolID值到"OpenStack Platform 11" 权利上
+		$ sudo subscription-manager attach  --pool=*
+	4、查找所有默认仓库和可使用仓库
+		$ sudo subscription-manager repos --disable=*
+		$ sudo subscription-manager repos --enable=rhel-7-server-rpms --enable=rhel-7-server-extras-rpms --enable=rhel-7-server-rh-common-rpms  --enable=rhel-ha-for-rhel-7-server-rpms --enable=rhel-7-server-openstack-11-rpms
+	5、升级
+		$ sudo yum update -y
+		$ sudo reboot
+		
+5、安装director依赖的所有包
+	$ sudo yum install -y python-tripleoclient
+
+6、director的配置
+	$ cp /usr/share/instack-undercloud/undercloud.com.sample  ~/undercloud.conf
+	
+	配置完成后，即可开始安装
+	$ openstack undercloud  install 
+		//可能会执行几分钟，会产生两个文件：
+				undercloud-passwords.conf：director服务的密码表
+				stackrc：初始化变量表，用于访问director的命令行
+	
+	配置文件也自动启动所有OpenStack Platform服务，在命令行里检查可用的服务器
+	$ sudo systemctl list-units openstack-*
+	
+	初始化stack用户
+	$ source ~/stackrc
+	
+7、为云端节点获取images
+	$ sudo yum install rhosp-director-images  rhosp-director-images-ipa
+	
+	$ cd ~/images
+	$ for i in /usr/share/rhosp-director-images/overcloud-full-latest-11.0.tar  /usr/share/rhosp-director-images/ironic-python-agent-latest-11.0.tar;do tar -xvf $i; done
+	
+	导入这些图片到director
+	$ openstack overcloud image upload --image-path  /home/stack/images/
+
+	上传下列图么到director：bm-deploy-kernel、bm-deploy-ramdisk、overcloud-full、overcloud-full-initrd、overcloud-full-vmlinuz
+	$ openstack image list
+	
+	若未列出以上图片，复制以下文件到/httpboot
+		$ ls -l /httpboot
+		total 341460
+		-rwxr-xr-x. 1 root root   5153184 Mar 31 06:58 agent.kernel
+		-rw-r--r--. 1 root root 344491465 Mar 31 06:59 agent.ramdisk
+		-rw-r--r--. 1 root root       337 Mar 31 06:23 inspector.ipxe
+
+8、在undercloud中设置一个nameserver
+	$ openstack subnet list
+	$ openstack subnet set --dns-nameserver [ nameserver1-ip]  --dns-nameserver [nameserver2-ip] [subnet-uuid]
+	
+	查看子网：
+	$ openstack subnet show [subnet-uuid]
+	
+
+
+###########################################################	
+使用CLI配置 a basic overcloud
+	
+	1、手动创建instackenv.json
+	如：
+		{
+			"nodes":[
+				{
+					"mac":[
+						"bb:bb:bb:bb:bb:bb"
+					],
+					"cpu":"4",
+					"memory":"6144",
+					"disk":"40",
+					"arch":"x86_64",
+					"pm_type":"pxe_ipmitool",
+					"pm_user":"admin",
+					"pm_password":"p@55w0rd!",
+					"pm_addr":"192.168.24.205"
+				},
+				{
+					"mac":[
+						"cc:cc:cc:cc:cc:cc"
+					],
+					"cpu":"4",
+					"memory":"6144",
+					"disk":"40",
+					"arch":"x86_64",
+					"pm_type":"pxe_ipmitool",
+					"pm_user":"admin",
+					"pm_password":"p@55w0rd!",
+					"pm_addr":"192.168.24.206"
+				}
+			]
+		}
+
+	解析：
+	pm_type
+		The power management driver to use. This example uses the IPMI driver (pxe_ipmitool).
+	pm_user; pm_password
+		The IPMI username and password.
+	pm_addr
+		The IP address of the IPMI device.
+	mac
+		(Optional) A list of MAC addresses for the network interfaces on the node. Use only the MAC address for the Provisioning NIC of each system.
+	cpu
+		(Optional) The number of CPUs on the node.
+	memory
+		(Optional) The amount of memory in MB.
+	disk
+		(Optional) The size of the hard disk in GB.
+	arch
+		(Optional) The system architecture.
+
+	在家目录下创建instackenv.json，然后执行
+	$ openstack overcloud node import ~/instackenv.json
+	
+	$node节点注册和配置完成后，查询nodes 列表
+	$ openstack baremetal node list
+	
+	2、检查node节点的硬件属性
+	$ openstack overcloud node introspect --all-manageable --provide
+		--all-manageable：仅检查node节点的管理状态
+		--provide：自检后将所有节点重置为活跃状态
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
