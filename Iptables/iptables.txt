@@ -1,0 +1,373 @@
+简介：
+       iptables [-t table] {-A|-D} chain rule-specification
+
+       iptables [-t table] -I chain [rulenum] rule-specification
+
+       iptables [-t table] -R chain rulenum rule-specification
+
+       iptables [-t table] -D chain rulenum
+
+       iptables [-t table] -S [chain [rulenum]]
+
+       iptables [-t table] {-F|-L|-Z} [chain [rulenum]] [options...]
+
+       iptables [-t table] -N chain
+
+       iptables [-t table] -X [chain]
+
+       iptables [-t table] -P chain target
+
+       iptables [-t table] -E old-chain-name new-chain-name
+
+       rule-specification = [matches...] [target]
+
+       match = -m matchname [per-match-options]
+
+       target = -j targetname [per-target-options]
+
+
+tables：
+        -t  [--table]
+           raw：  OUTPUT/PREROUTING
+           mangle：PREROUNTING/INPUT/FORWARD/OUTPUT/POSTROUTING
+           nat：   PREROUNTING/OUTPUT/POSTROUNTING             
+            filter： INPUT/FORWARD/OUTPUT
+            
+option：
+     COMMAND：
+            -A  --append       在规则列表的最后增加1条规则
+            -D  --delete [chain]       从规则列表中删除1条规则
+            -I   --insert         在指定的位置插入1条规则，默认插入成第一条
+            -R  --replace        替换规则列表中的某条规则
+            -L   --list              查看,v详细,n不反解
+            -S  --list-rules [chain]    显示指定链中的所有规则        
+            -F  --flush             删除表中的所有规则
+            -Z  --zero              将表中数据包计数器和流量计数器归零
+            -N  --new-chain     创建自定义链
+            -X  --delete-chain  删除自定义链
+            -P  --policy
+            -E  --rename-chain
+            -h
+       PARAMETERS：
+            [!] -p, --protocol protocol/numeric
+                  tcp,  udp,  udplite,  icmp,  esp, ah, sctp, all
+                  A protocol name from /etc/protocols is also allowed.  
+            [!] -s, --source address[/mask][,...]
+                   --src 
+            [!] -d, --destination address[/mask][,...]
+                   --dst 
+            -j, --jump target       
+            -g, --goto chain
+            [!] -i, --in-interface name
+                 INPUT, FORWARD and PREROUTING chains
+            [!] -o, --out-interface name
+                 FORWARD,  OUTPUT and  POSTROUTING  chains                         
+            [!] -f, --fragment
+                   该规则涉及碎片分组和碎片包的进一步碎片，由于无法告知此类分组的源端口或目标端口（或ICMP类型），这样的包将不匹配指定它们的任何规则
+                    “！” 参数代表这个规则只匹配HEAD碎片或没有破碎的包
+             -c, --set-counters packets/bytes
+                    使管理员能够初始化规则的包和字节计数器（在插入、追加、替换操作期间）
+        
+        OTHER OPTIONS：
+             -v, --verbose
+             -n, --numeric    【Numeric  output.  】
+
+       -x, --exact
+              显示的数据包和字节计数器的精确值，This option is only relevant for the -L command.
+
+       --line-numbers
+              打印链中rule对应rulenumber
+
+       --modprobe=command
+              When  adding  or inserting rules into a chain, use command to load any necessary modules (targets, match extensions, etc).
+         
+MATCH EXTENSIONS 【扩展匹配】
+            iptables 可以使用匹配模块的扩展包，有两种加载方式：-p or --protocol指定，  还可以使用-m or --match 选项，后跟匹配模块的名字，在一行里可以指定多行匹配模块，也可以在模块名后面使用-h or --help 选项获取该模块的帮助
+            addrtype
+                    这个模块是基于ip地址类型进行匹配，地址类似在内核网络堆栈中使用，并将地址分配到不同的组中。组的准确定义依赖于特定的三层协议
+                    Address type match options:
+                         [!] --src-type type[,...]      Match source address type
+                         [!] --dst-type type[,...]      Match destination address type
+                         --limit-iface-in           Match only on the packet's incoming device
+                         --limit-iface-out          Match only on the packet's incoming device
+
+                    Valid types:           
+                                UNSPEC：不指定地址
+                                UNICAST：单播
+                                LOCAL：本地
+                                BROADCAST：广播
+                                ANYCAST：任播
+                                MULTICAST：多路广播
+                                BLACKHOLE： a blackhole address
+                                UNREACHABLE：不能达到的
+                                PROHIBIT：阻止、禁止
+                                THROW  [FIXME]：投、抛  
+                                NAT  [FIXME]：
+                                XRESOLVE：
+
+            ah
+                    这个模块用于匹配IPsec包中的鉴别头的SPIs
+                    [!] --ahspi spi[:spi]
+           
+           cluster
+                    允许在不部署负载均衡的情况下，配置网关和后端负载共享
+                    这个匹配要求所有的节点能看到相同的包，因此，集群匹配决定是否这个节点是否必须处理给定的包根据下面的选项：
+                    --cluster-total-nodes     num        设置为集群全部节点的数量
+                    [!] --cluster-local-node   num       设置本地节点的number ID
+                    [!] --cluster-local-nodemask    mask    设置本地节点的number ID 的掩码，可以使用这个选项替代--clouster-local-node
+                    --cluster-hash-seed     value       Set seed value of the Jenkins hash.
+                            Example:
+                            iptables -A PREROUTING -t mangle -i eth1 -m cluster --cluster-total-nodes 2 --cluster-local-node 1 --cluster-hash-seed 0xdeadbeef -j MARK --set-mark 0xffff
+                            iptables -A PREROUTING -t mangle -i eth2 -m cluster --cluster-total-nodes 2 --cluster-local-node 1 --cluster-hash-seed 0xdeadbeef -j MARK --set-mark 0xffff
+                            iptables -A PREROUTING -t mangle -i eth1 -m mark ! --mark 0xffff -j DROP
+                            iptables -A PREROUTING -t mangle -i eth2 -m mark ! --mark 0xffff -j DROP
+                    
+                   And the following commands to make all nodes see the same packets:
+                            ip maddr add 01:00:5e:00:01:01 dev eth1
+                            ip maddr add 01:00:5e:00:01:02 dev eth2
+                            arptables -A OUTPUT -o eth1 --h-length 6 -j mangle --mangle-mac-s 01:00:5e:00:01:01
+                            arptables -A INPUT -i eth1 --h-length 6 --destination-mac 01:00:5e:00:01:01 -j mangle --mangle-mac-d 00:zz:yy:xx:5a:27
+                            arptables -A OUTPUT -o eth2 --h-length 6 -j mangle --mangle-mac-s 01:00:5e:00:01:02
+                            arptables -A INPUT -i eth2 --h-length 6 --destination-mac 01:00:5e:00:01:02 -j mangle --mangle-mac-d 00:zz:yy:xx:5a:27
+            
+                In the case of TCP connections, pickup facility has to be disabled to avoid marking TCP ACK packets coming in the reply direction as valid.
+                在tcp链接的情况下，收集设备必须禁用，以免标记在应答方向的TCP ACK数据包是有效的
+                            echo 0 > /proc/sys/net/netfilter/nf_conntrack_tcp_loose
+                 
+           comment
+                允许对任何规则添加注释
+                 --comment               
+                            Example:
+                                  iptables -A INPUT -s 192.168.0.0/16 -m comment --comment "A privatized IP block"
+
+             conntrack
+                    当与连接跟踪结合，此模块可以访问连接或包的链接状态
+                     [!] --ctstate statelist        statelist 是一个以逗号分割的匹配链接状态的列表，下面是可能的状态列表
+                              INVALID：指没有已知的连接与该包相关联
+                              NEW：1、数据包开启一个新连接；2、与未在两个方向上看到数据包的连接相关联
+                              ESTABLISHED：与一个在两个方向上看到数据包的连接相关联
+                              RELATED：数据包正在启动一个新的连接，但它与一个已经存在的连接相关联，如ftp数据传输，或ICMP错误
+                              SNAT：虚拟状态，如果原始源地址与应答地址不同，则匹配
+                              DNAT：虚拟状态，如果原始目的地址与应答源不同，则匹配。                     
+                     
+              
+                     [!] --ctproto l4proto          四层协议匹配【数字或名字】
+
+                     [!] --ctorigsrc address[/mask]
+                     [!] --ctorigdst address[/mask]
+                     [!] --ctreplsrc address[/mask]
+                     [!] --ctrepldst address[/mask]         与原始/回复、来源/目的地址匹配
+                          
+                     [!] --ctorigsrcport port
+                     [!] --ctorigdstport port
+                     [!] --ctreplsrcport port
+                     [!] --ctrepldstport port       与原始/回复、来源/目的端口或GRE key 相匹配
+
+                     [!] --ctstatus statelist
+                            statuslist is a comma separated list of the connection statuses to match.  Possible statuses are listed below.
+                            
+                             NONE：   None of the below.【下面没有了】
+                             EXPECTED：这是一个预期的连接（即一个连接跟踪辅助设置）
+                             SEEN_REPLY：连接跟踪过两个方向包。
+                                   Conntrack has seen packets in both directions.
+                             ASSURED：连接跟踪入口不应该早过期
+                                    Conntrack entry should never be early-expired.
+                             CONFIRMED：确认
+                                    Connection is confirmed: originating packet has left box.
+
+                     [!] --ctexpire time[:time]     把剩余生存时间与给定的值或范围值[包含]相匹配
+                            Match remaining lifetime in seconds against given value or range of values (inclusive)
+
+                     --ctdir {ORIGINAL|REPLY}      匹配在指定方向流动的包，如果该标记没有指定，则匹配两个方向上的包
+            
+           icmp：
+                    如果指定了“--protocol icmp”，可以使用次扩展
+                    [!] --icmp-type {type[/code]|typename}
+                    查看帮助：
+                            iptables   -p icmp  -h
+                            
+            state：
+                    当与连接跟踪相结合，此模块允许访问此包的连接跟踪状态                
+                     [!] --state state
+                              INVALID
+                              ESTABLISHED
+                              NEW
+                              RELATED
+                              
+           tcp
+                    如果使用了“--protocol tcp”，可以使用一下选项                   
+                    [!] --source-port,--sport port[:port]
+                    [!] --destination-port,--dport port[:port]
+                    [!] --tcp-flags mask comp
+                    当TCP标志按指定时匹配。第一个参数掩码是我们应该检查的标志，作为逗号分隔的列表编写，第二个参数COMP是一个逗号分隔的必须设置的标志列表。
+                          Flags are: SYN ACK FIN RST URG PSH ALL NONE.  
+                  因此，命令
+                       iptables -A FORWARD -p tcp --tcp-flags SYN,ACK,FIN,RST SYN
+                  将只匹配设置了SYN标志和没有ACK、FIN及RST标志的包
+                    [!] --syn
+                        只匹配配置了SYNbit位的tcp包  
+                    [!] --tcp-option number
+                        Match if TCP option set.
+
+            time
+                    如果包的到达时间在给定的范围内，则匹配。所有选项可选
+	                --datestart YYYY[-MM[-DD[Thh[:mm[:ss]]]]]
+                    --datestop YYYY[-MM[-DD[Thh[:mm[:ss]]]]]
+			        只有在给定的时间内匹配，必须在ISO 8601“T”表示法中。可能的时间范围是1970 -01- 01T00:00到2038 -01- 19T04:17:07。
+			        如果没有指定--datestart或--datestop，将分别默认为1970-01-01和2038-01-19
+
+                   --timestart hh:mm[:ss]
+                   --timestop hh:mm[:ss]
+    			  只匹配给定时间内的。可能的时间范围是00:00:00到23:59:59。允许前导零（例. “06:03”）并正确地解释为base-10。
+
+                   [!] --monthdays day[,day...]
+	    		  只匹配给定的天数内的，可能的值是1—31，注意特别的，当没有31天的月，不进行匹配第31天，同样的情况也会发生在28天或29天的二月。
+
+                   [!] --weekdays day[,day...]
+	    		  仅在给定的周中匹配，可能值分别为：Mon, Tue, Wed, Thu, Fri, Sat, Sun, 或者 1 to 7, 也可以使用2个字符的变体（Mo, Tu, etc...）
+
+                   --utc
+			      说明“--datestart,--datestop,--timestart,--timestop”是UTC时间
+
+                   --localtz
+			       说明“--datestart,--datestop,--timestart,--timestop”是本地内核时间【默认】
+
+                  EXAMPLES：
+			            To match on weekends, use:
+                              -m time --weekdays Sa,Su
+                        To match (once) on a national holiday block:
+                              -m time --datestart 2007-12-24 --datestop 2007-12-27
+			            因为通常包含停止时间，可以根据下面的方式避免匹配新一天的第一秒：
+                              -m time --datestart 2007-01-01T17:00 --datestop 2007-01-01T23:59:59
+			            During lunch hour:
+                              -m time --timestart 12:30 --timestop 13:30
+			            The fourth Friday in the month:
+                              -m time --weekdays Fr --monthdays 22,23,24,25,26,27,28
+
+
+        其他模块：
+             connbytes、connlimit、connmark、dccp、dscp、ecn、esp、hashlimit、helper、iprange、length、limit、mac、mark、multiport、owner、phtsdev、pkttype、policy、quota、rateest、realm、recent、sctp、set、socket、statistic、string、tcpmss、tos、ttl、u32、udp、unclean
+
+TARGET EXTENSIONS【目标扩展】
+        iptables可扩展目标模块：以下以纳入在标准分布
+                   AUDIT
+	                        此目标允许创建用于命中目标的包的审计记录。它可以用来记录接收、删除和拒绝包。详情请参阅auditd(8)。
+                           --type {accept|drop|reject}  设置审计记录类型
+                                  Example:
+                                      iptables -N AUDIT_DROP
+                                      iptables -A AUDIT_DROP -j AUDIT --type drop
+                                      iptables -A AUDIT_DROP -j DROP
+
+                   CHECKSUM
+                           这个目标允许有选择地围绕破坏/旧的应用程序工作。它只能用着mangle表内
+                           --checksum-fill
+                		  在一个没有校验和的包中计算和填写校验和。这一点特别有用，如果您需要处理诸如dhcp客户机之类的旧应用程序，这些应用程序不能很好地处理校验和卸载，但是不要在设备中禁用校验和卸载。
+
+                   CLASSIFY
+                           --set-class major:minor
+
+                   CLUSTERIP
+                           --new  Create a new ClusterIP.  You always have to set this on the first rule for a given ClusterIP.
+                           --hashmode mode
+                           --clustermac mac
+                           --total-nodes num
+                           --local-node num
+                           --hash-init rnd
+
+                   CONNMARK
+                           --set-xmark value[/mask]
+            	          The following mnemonics are available for --set-xmark:
+                				--and-mark bits
+                				--or-mark bits
+				                --xor-mark bits
+				                --set-mark value[/mask]
+				                --save-mark [--mask mask]
+				                --restore-mark [--mask mask]
+                           --save-mark [--nfmask nfmask] [--ctmask ctmask]
+                           --restore-mark [--nfmask nfmask] [--ctmask ctmask]
+
+                   CONNSECMARK
+                           --save 如果包有安全标记，如果连接没有被标记则为复制它
+                           --restore     如果包没有安全标记，而连接执行，则从连接到包复制安全标记。
+
+                    DNAT
+                            仅在nat表、PREROUTING、OUTPUT链里有效，用户定义的链仅可以从这些链中调用，它指定的包中的目的地址应该被修改（而且将来所有此链接的包也会被标记），规则应停止审查。这需要一种选择：
+                            --to-destination [ipaddr][-ipaddr][:port[-port]]
+                                    可以指定一个新目的IP地址、一个包含多个IP地址的范围、可选端口的范围（仅该规则使用“-p  tcp 或 -p  udp ”,它才失效），如果没有指定端口范围，目的端口不会被修改，如果没有指定IP地址，仅会修改目的端口【在内核2.6.10及以上版本，可以使用多个--to-destination选项】
+                            --random
+                                    如果使用此选项，端口映射将是随机的【kernel >= 2.6.22】
+                            --persistent
+                                    给每个连接提供相同的源/目的地址，将取代相同的目标【kernel>=2.6.29-rc2】
+                            
+                    log         
+                            打开匹配数据包的内核日志记录，当规则中使用此选项，内核将通过内核日志在所有匹配的包(如大多数IP头字段)上打印一些信息(在这里可以使用dmesg或syslogd(8)来读取它。这是一个“非终止目标”，规则遍历将继续下一条规则。因此，如果你想要记录你拒绝的数据包，使用两个单独的规则，使用相同的匹配标准，首先使用目标日志，然后删除（或拒绝）。
+                            --log-level   level：日志级别【数字或参见syslog.conf（5）】
+                            --log-prefix   prefix：指定前缀的前缀日志信息，长达29个字母，有助于区别日志中的信息
+                            --log-tcp-sequence ：  日志TCP序列号。如果日志是用户可读的，这是一个安全风险。
+                            --log-tcp-options：从tcp包的头部记录选项
+                            --log-ip-options：从IP包的头部记录选项
+                            --log-uid：记录生成包的过程的用户id。
+                            
+                  reject
+                            这是发送一个错误包，用于响应匹配的包：否则它等于DROP，它是一个终止目标，停止规则遍历。这个目标仅在INPUT、FORWORD和OUTPUT链中生效，用户自定义的链仅可以调用这些链，下面选项是控制返回错误包的种类：
+                                    
+                            --reject-with type
+                                    icmp-net-unreachable
+                                    icmp-host-unreachable
+                                    icmp-port-unreachable   [默认]
+                                    icmp-proto-unreachable
+                                    icmp-net-prohibited
+                                    icmp-host-prohibited
+                                    icmp-admin-prohibited(*)
+                            返回适当的错误信息，tcp-reset选项仅用于与tcp协议相匹配的规则中：这会导致发送回TCP RST包。这对于阻塞ident(113 / tcp)探测非常有用，因为在发送邮件给破碎的邮件主机时经常会发生这样的问题(否则无法接受您的邮件)。
+                            (*)用icmp-admin-prohibited在不支持它的内核上，将导致一个简单的DROP替代REJECT
+                            
+                       SNAT
+                                该目标仅在nat表、POSTROUTING链中有效，它指定的包的源地址会被修改（将来这条连接的所有包会被标记），规则应停止审查。这需要一种选择：
+                                --to-source ipaddr[-ipaddr][:port[-port]]
+                                --random
+                                --persistent
+ 
+
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                     DSCP、ECN、mark、MASQUERADE、MIRROR、NETMAP、NFLOG、NFQUEUE、NOTRACK、RATEEST、REDIRECT、SAME、SECMARK、SET、TCPMSS、TCPOPTSTRIP、TOS、TPROXY、TRACE、TTL、ULOG、
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+
+                    
+
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
