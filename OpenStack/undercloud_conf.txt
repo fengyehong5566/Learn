@@ -1,15 +1,15 @@
-undercloud.confÎÄ¼şÏê½â
+undercloud.confæ–‡ä»¶è¯¦è§£
 
 $ cp /usr/share/instack-undercloud/undercloud.conf.sample ~/undercloud.conf
 
-Ä£°åÎÄ¼ş°üº¬[default]ºÍ[auth]Á½²¿·Ö
+æ¨¡æ¿æ–‡ä»¶åŒ…å«[default]å’Œ[auth]ä¸¤éƒ¨åˆ†
 
-¡¾default¡¿²¿·Ö£º
-	undercloud_hostname£ºÕâÖ»ºÏÊÊµÄÍêÈ«µÄÖ÷»úÃû
-		Èç¹ûÉèÖÃ£¬½«ÅäÖÃËùÓĞÏµÍ³µÄÖ÷»úÃû
-		Èç¹û²»ÉèÖÃ£¬Ä¬ÈÏÊ¹ÓÃµ±Ç°Ö÷»úÃû¡¾µ±Ç°µÄÖ÷»úÃû±ØĞëºÏÊÊ¡¿
+ã€defaultã€‘éƒ¨åˆ†ï¼š
+	undercloud_hostnameï¼šè¿™åªåˆé€‚çš„å®Œå…¨çš„ä¸»æœºå
+		å¦‚æœè®¾ç½®ï¼Œå°†é…ç½®æ‰€æœ‰ç³»ç»Ÿçš„ä¸»æœºå
+		å¦‚æœä¸è®¾ç½®ï¼Œé»˜è®¤ä½¿ç”¨å½“å‰ä¸»æœºåã€å½“å‰çš„ä¸»æœºåå¿…é¡»åˆé€‚ã€‘
 	
-	local_ip£º¶ÔdirectorÌá¹©µÄÍøÂçÉè±¸¶¨ÒåipµØÖ·
+	local_ipï¼šå¯¹directoræä¾›çš„ç½‘ç»œè®¾å¤‡å®šä¹‰ipåœ°å€
 	network_gateway
 	underclous_public_host
 	undercloud_admin_host
@@ -48,14 +48,14 @@ $ cp /usr/share/instack-undercloud/undercloud.conf.sample ~/undercloud.conf
 	clean_nodes
 	enabled_drivers
 
-¡¾auth¡¿²¿·Ö£º
+ã€authã€‘éƒ¨åˆ†ï¼š
 	undercloud_db_password
 	undercloud_admin_token
 	undercloud_admin_password
 	undercloud_glance_password
 	...
 	
-ĞŞ¸ÄÍê³Éºó£¬¼´¿É¿ªÊ¼°²×°
+ä¿®æ”¹å®Œæˆåï¼Œå³å¯å¼€å§‹å®‰è£…
 	$ openstack undercloud install 
 
 
