@@ -1,0 +1,109 @@
+nginx的rpm包：
+    nginx支持动态模块,下面的模块被动态的built,并作为单独的包进行使用
+	nginx-module-geoip
+	nginx-module-image-filter
+	nginx-module-njs
+	nginx-module-perl
+	nginx-module-xslt
+
+源码安装nginx:
+	configure命令支持一下参数：【使用范围】
+		--prefix=path   #定义一个文件存放服务文件，对于那些在configure（除路径的库源）和在nginx.conf配置文件中设置的相对路径。此目录将视那些相对路径的当前文件夹。
+		--sbin-path=	#设置一个nginx的可执行文件的名称（此名称仅在安装过程中使用）。默认文件名为 ${prefix}/sbin/nginx
+		--conf-path=	#设置一个名为nginx.conf的配置文件。如果需要的话，nginx可以用不同的配置文件启动，如：“-c file”
+		--pid-path=		#设置一个名为nginx.pid的文件,用于存储主进程的进程ID【全局】
+
+		--error-log-path=	#设置一个文件名,用于存储主错误、警告、诊断等日志【main/http/mail/stream/server/localtion】
+					【syntax：error_log file [level]; 
+					  default：error_log logs/error.log error;】
+		--http-log-path=	#设置一个文件名,用于记录http服务的请求日志
+					【Syntax:	access_log path [format [buffer=size] [gzip[=level]] [flush=time] [if=condition]];
+							access_log off;
+					Default: access_log logs/access.log combined;
+					Context: http, server, location, if in location, limit_except】
+
+		--build=	#设置一个可选的nginx build名字
+		--user=		#设置一个无特权用户,其凭据将被工作进程使用,默认nobody
+		--group=	#设置一个用户组,其凭据将被工作进程使用,默认为${user}名字
+
+		--with-select_module=	#开启/禁用模块，该模块允许服务使用select()方法工作，如果平台不发布支持更合适的方法(如:kqueue、epoll或/dev/poll),该模块将自动创建
+			--without-select_module=
+
+		--with-poll_module=		#开启/禁用模块，该模块允许服务使用poll()方法工作，如果平台不发布支持更合适的方法(如:kqueue、epoll或/dev/poll),该模块将自动创建
+			--without-poll_module=
+
+		--without-http_proxy_module=	#禁止构建http服务的代理模块
+		--with-http_ssl_module=		#启用模块,该模块向http服务添加HTTPS协议的支持,默认不启用,如需构建和运行该模块,则依赖OpenSSL库
+
+		--without-http_gzip_module=		#禁止压缩http服务的响应,如需构建和运行该模块,则依赖zlib库
+		--with-zlib=	#设置zlib库的源路径,需要从zlib站点下载库分发版(版本1.1.3 1.2.11)，并提取.其他的由nginx的configure和make命令完成,该库是ngx_http_giz_modle模块所必需的
+
+		--without-http_rewrite_module=	#禁止,该模块能让http服务进行重定向和改变请求的URI，如需构建和运行该模块,则依赖PCRL库
+		--with-pcre=	#设置PCRE库的源路径,在版本(4.4-8.41)中,需要去PCRE的网站下载并安装.其他的由nginx的configure和make命令完成,该库是location指令和ngx_http_rewrite_module模块中正则表达式支持所必需的。
+		--with-pcre-jit=	#使用“just-in-time(即时编译)”支持(1.1.12，pcre_jit指令)构建PCRE库。
+
+
+		--with-cc-opt=	#增加CFLAGS变量的其他附加参数,当在FreeBSD下使用系统PCRE库时,应该指定'--with-cc-opt="-I /usr/local/include"',如果需要增加select()支持的文件的数量，那么也可以在这里指定，如：--with--cc-opt="-D FD_SETSIZE=2048"
+		--with-ld-opt=		#设置连接期间使用的其他参数，当在FreeBSD下使用系统PCRE库时,应该指定'--with-ld-opt="-L /usr/local/lib"'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
