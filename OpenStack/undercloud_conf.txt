@@ -1,0 +1,90 @@
+undercloud.conf文件详解
+
+$ cp /usr/share/instack-undercloud/undercloud.conf.sample ~/undercloud.conf
+
+模板文件包含[default]和[auth]两部分
+
+【default】部分：
+	undercloud_hostname：这只合适的完全的主机名
+		如果设置，将配置所有系统的主机名
+		如果不设置，默认使用当前主机名【当前的主机名必须合适】
+	
+	local_ip：对director提供的网络设备定义ip地址
+	network_gateway
+	underclous_public_host
+	undercloud_admin_host
+	undercloud_nameservers
+	undercloud_ntp_servers
+	undercloud_service_certificate
+	generate_service_certificate
+	certificate_generation_ca
+	service_principal
+	local_interface
+	local_mtu
+	network_cidr
+	masquerade_network
+	dhcp_start;dhcp_end
+	hieradata_override
+	net_config_override
+	inspection_interface
+	inspection_iprange
+	inspection_extras
+	inspection_runbench
+	inspection_enable_uefi
+	enable_node_discovery
+	discovery_default_diver
+	undercloud_debug
+	undercloud_update_packages
+	enable_template
+	enable_telemetry
+	enable_ui
+	enable_validations
+	enable_legacy_ceilometer_api
+	enable_novajion
+	ipa_otp
+	store_events
+	ipxe_enable
+	scheduler_max_attempts
+	clean_nodes
+	enabled_drivers
+
+【auth】部分：
+	undercloud_db_password
+	undercloud_admin_token
+	undercloud_admin_password
+	undercloud_glance_password
+	...
+	
+修改完成后，即可开始安装
+	$ openstack undercloud install 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
