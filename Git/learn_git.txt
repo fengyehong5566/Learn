@@ -174,7 +174,7 @@
 		你和你的同事同时对readme.txt文件进行了修改，发生冲突：
 			把最新的提交从origin/dev抓下来：
 				[zhy@localhost git]$ git pull    
-			如果失败：
+			如果失败,为这个分支设置跟踪信息(即创建本地分支与远程分支的链接关系)：
 				[zhy@localhost git]$ git branch --set-upstream dev  origin/dev
 			再次pull。
 			
