@@ -123,17 +123,31 @@ option：
 
 -j :
     ACCEPT target
+        这个目标不需要进一步的选择。 只要一个数据包的匹配规范已经完全满足，并且我们指定ACCEPT作为目标，规则就被接受，并且不会继续遍历当前链或者同一个表中的其他链。 但是请注意，一个链中接受的数据包仍然可以穿过其他表中的链，并且仍然可以在这里丢弃。 这个目标没有什么特别之处，也不需要，也没有可能为目标增加选项。 要使用这个目标，我们只需指定-j ACCEPT。
+
     CLASSIFY target
     CLUSTERIP target
     CONNMARK target
     CONNSECMARK target
     DNAT target
+        DNAT目标被用来做目标网络地址转换，这意味着它被用来重写数据包的目标IP地址。如果数据包匹配，这是规则的目标，则数据包以及同一个数据流中的所有后续数据包将被转换，然后路由到正确的设备，主机或网络。这个目标可以是非常有用的，例如，当你有一个主机在局域网内运行你的网络服务器，但没有真正的IP给它在互联网上工作。然后你可以告诉防火墙将所有的数据包转发到它自己的HTTP端口，然后转发到局域网内的真实网络服务器上。我们也可以指定一个完整的目标IP地址范围，DNAT机制将为每个流随机选择目的IP地址。因此，我们可以通过这样做来处理一种负载平衡。请注意，DNAT目标仅在nat表中的PREROUTING和OUTPUT链中可用，以及从任何列出的链中调用的任何链。请注意，包含DNAT目标的链可能不能用于任何其他链，如POSTROUTING链。
+        example:  iptables -t nat -A PREROUTING -p tcp -d 15.45.23.67 --dport 80 -j DNAT --to-destination 192.168.1.1-192.168.1.10
     DROP target
+        DROP的目标就是这么做的，它会丢弃数据包，不会执行任何进一步的处理。 完美匹配规则的数据包然后被丢弃将被阻止。 请注意，此操作在某些情况下可能会产生不必要的影响，因为它可能会在任一主机上留下死穴。 在可能的情况下，更好的解决方案是使用REJECT目标，尤其是当您想要阻止端口扫描程序获取太多信息时，例如在过滤的端口上等等。 还要注意的是，如果一个数据包在子链上采取了DROP动作，那么数据包将不会在任何主链中或在任何其他表中被处理。 换句话说，数据包完全死了。 正如我们以前所见，目标不会向任何方向发送任何类型的信息，也不会向路由器等中介发送任何信息。
+        
     DSCP target
     ECN target
     LOG target options
     MARK target
+        expamle:   iptables -t mangle -A PREROUTING -p tcp --dport 22 -j MARK --set-mark 2
+
     MASQUERADE target
+        MASQUERADE目标与SNAT目标基本相同，但不需要任何“源”选项。原因在于MASQUERADE目标是用于例如拨号连接或DHCP连接，当连接到有问题的网络时获得动态IP地址。这意味着你只应该使用带有动态分配的IP连接的MASQUERADE目标，我们并不知道任何时候的实际地址。如果你有一个静态的IP连接，你应该使用SNAT目标。
+        当您伪装一个连接时，这意味着我们设置了在特定网络接口上使用的IP地址，而不是--to-source选项，并且IP地址是从关于特定接口的信息中自动获取的。 MASQUERADE目标还具有当接口关闭时连接被遗忘的效果，例如，如果我们杀死一个特定的接口，这是非常好的。 如果我们使用了SNAT目标，我们可能会留下很多旧的连接跟踪数据，这些数据会被搁置几天，吞噬有用的连接跟踪内存。 一般而言，这是处理拨号线路时的正确行为，每次拨出线路时可能会分配一个不同的IP。 如果我们被分配了不同的IP地址，那么连接就会丢失，而且保持输入的状态或多或少是愚蠢的。
+        即使你有一个静态IP，仍然可以使用MASQUERADE目标而不是SNAT，但是这样做不好，因为它会增加额外的开销，并且在未来可能会有不一致的情况，从而阻碍你现有的脚本和呈现 他们“无法使用”。
+        请注意，MASQUERADE目标仅在nat表的POSTROUTING链中有效，就像SNAT目标一样。 MASQUERADE目标需要下面指定的一个选项，这是可选的。
+        example:     iptables -t nat -A POSTROUTING -p TCP -j MASQUERADE --to-ports 1024-31000
+
     MIRROR target
     NETMAP target
     NFQUEUE target
@@ -141,15 +155,24 @@ option：
     QUEUE target
     REDIRECT target
     REJECT target
+        REJECT目标与DROP目标基本相同，但是它也向发送阻塞的数据包的主机发回错误消息。 目前REJECT目标仅在INPUT，FORWARD和OUTPUT链或其子链上有效。 毕竟，这些将成为唯一一个把这个目标放在一个有意义的链条上。 请注意，所有使用REJECT目标的链只能通过INPUT，FORWARD和OUTPUT链调用，否则它们将不起作用。 目前只有一个选项可以控制这个目标的工作性质，尽管这可能会带来一大堆变量。 如果你有一个TCP / IP的基本知识，他们大多是相当容易理解的。
+        example:   iptables -A FORWARD -p TCP --dport 22 -j REJECT --reject-with tcp-reset
+
     RETURN target
+        返回目标将导致当前数据包停止通过链条到达规则。 如果是另外一个链条的子链，那么这个数据包将继续穿过上级链，就好像什么也没发生过一样。 如果链是主链，例如INPUT链，则数据包将具有默认策略。 默认策略通常设置为ACCEPT，DROP或类似的。 例如，假设一个数据包进入INPUT链，然后碰到一个匹配的规则，并将其告知 - 跳转到EXAMPLE_CHAIN。 然后数据包将开始遍历EXAMPLE_CHAIN，并突然匹配一个具有--jump RETURN目标集的特定规则。 然后它将跳回到INPUT链。 另一个例子是，如果数据包在INPUT链中碰到了一个--jump RETURN规则。 然后它将被放弃到前面描述的默认策略，并且不会在这个链中采取更多的行动。
+
     SAME target
     SECMARK target
     SNAT target
+        SNAT目标被用来做源网络地址转换，这意味着这个目标将重写数据包的IP头中的源IP地址。这就是我们想要的，例如，当几个主机必须共享一个Internet连接。然后，我们可以在内核中打开ip转发，并编写一个SNAT规则，将所有从本地网络传出的数据包转换为我们自己Internet连接的源IP。如果不这样做，外面的世界将不知道在哪里发送回复数据包，因为我们的本地网络大多使用分配给LAN网络的IANA指定的IP地址。如果我们按原样转发这些数据包，互联网上的任何人都不会知道他们确实来自我们。 SNAT目标完成所有需要做这种工作的翻译，让所有的数据包离开我们的局域网，看起来好像他们来自单个主机，这将是我们的防火墙。 SNAT目标仅在POSTROUTING链内的nat表内有效。换句话说，这是您可以使用SNAT的唯一链条。只有连接中的第一个数据包被SNAT破坏，之后所有使用相同连接的数据包也将被SNATted。此外，POSTROUTING链中的初始规则将应用于同一个流中的所有数据包。
+        example:  iptables -t nat -A POSTROUTING -p tcp -o eth0 -j SNAT --to-source 194.236.50.155-194.236.50.160:1024-32000
+
     TCPMSS target
     TOS target
     TTL target
     ULOG target
 
+====================================
 -m :
     Addrtype match
     AH/ESP match
@@ -163,6 +186,19 @@ option：
     IP range match
     Length match
     Limit match
+        限制匹配扩展必须使用-m限制选项显式加载。例如，可以使用此匹配来限制特定规则的记录等。例如，可以使用此匹配所有不超过给定值的数据包，并且超过此值后，限制记录日志有问题的事件。考虑时间限制：您可以限制某个规则在特定时间范围内可以匹配的次数，例如，以减少DoS syn flood攻击的影响。这是它的主要用法，当然还有更多的用法。限制匹配也可以通过添加一个！在极限比赛前的旗帜。它会被表示为-m限制！ - limit 5 / s。这意味着所有的数据包都会在打破限制后进行匹配。
+        为了进一步解释极限匹配，它基本上是一个令牌桶过滤器。考虑有一个漏桶，每个时间单元泄漏X个数据包。 X取决于我们得到的匹配数据包的数量，所以如果我们得到3个数据包，那么每个时间单元的数据包就会泄露3个数据包。 --limit选项告诉我们每个时间单位有多少个数据包来重新装满数据包，而--limit-burst选项告诉我们数据包有多大。所以，设置 - 限制3分钟 - 限制突发5，然后接收5场比赛将清空桶。 20秒之后，水桶被重新填充另一个标记，依此类推，直到再次到达 - 极限突发或者直到它们被使用。
+        考虑下面的例子来进一步解释这可能看起来如何。
+            1，我们用-m limit - limit 5 / second --limit-burst 10 / second来设置规则。极限突发令牌桶初始设置为10。每个匹配规则的数据包使用一个令牌。
+            2，我们得到匹配的数据包，1-2-3-4-5-6-7-8-9-10，都在1/1000秒内。
+            3，令牌桶现在是空的。一旦令牌桶为空，那么符合规则的数据包就不再符合规则，并进入下一个规则（如果有的话），或命中链策略。
+            4，每1/5秒没有匹配的数据包，令牌数量增加1，最多10个数据包在收到10个数据包之后，我们将再次剩下5个令牌。
+            5，当然，对于接收到的每个数据包，桶将被清空1个令牌。
+        --limit
+            example:    iptables -A INPUT -m limit --limit 3/hour
+        --limit-burst
+            example:    iptables -A INPUT -m limit --limit-burst 5
+
     Mac match
     Mark match
     Multiport match
