@@ -579,6 +579,19 @@ TARGET EXTENSIONS【目标扩展】
 流向：
           
 
+
+
+
+基本动作Target
+-j ACCEPT               接受                filter
+-j REJECT               拒绝                filter
+-j DROP                 丢弃                filter
+-j LOG                   记录日志       filter
+-j SNAT                 源地址转换  nat
+-j MASQUERADE     伪装              nat     
+-j DNAT                 目标地址转换    nat     目标地址及端口映射（转换）
+-j REDIRECT           端口转换       nat     本地端口转换（本机）
+-j MARK                  标记               mangle
             
             
             
