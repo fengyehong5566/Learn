@@ -1,0 +1,178 @@
+usage: vmstat [-V] [-n] [delay [count]]
+              -V prints version.
+              -n causes the headers not to be reprinted regularly.
+              -a print inactive/active page stats.
+              -d prints disk statistics
+              -D prints disk table
+              -p prints disk partition statistics
+              -s prints vm table
+              -m prints slabinfo
+              -t add timestamp to output
+              -S unit size
+              delay is the delay between updates in seconds. 
+              unit size k:1000 K:1024 m:1000000 M:1048576 (default is K)
+              count is the number of updates.
+
+
+			  
+			  
+			  
+
+VMSTAT(8)                Linux Administrator’s Manual                VMSTAT(8)
+
+NAME
+       vmstat - Report virtual memory statistics
+
+SYNOPSIS
+       vmstat [-a] [-n] [-t] [-S unit] [delay [ count]]
+       vmstat [-s] [-n] [-S unit]
+       vmstat [-m] [-n] [delay [ count]]
+       vmstat [-d] [-n] [delay [ count]]
+       vmstat [-p disk partition] [-n] [delay [ count]]
+       vmstat [-f]
+       vmstat [-V]
+
+DESCRIPTION
+       vmstat reports information about processes, memory, paging, block IO, traps, and cpu activity.
+
+       The first report produced gives averages since the last reboot.  Additional reports give information on a sampling period of length delay.  The process and memory reports are instantaneous in either case.
+
+   Options
+       The -a switch displays active/inactive memory, given a 2.5.41 kernel or better.
+
+       The -f switch displays the number of forks since boot.  This includes the fork, vfork, and clone system calls, and is equivalent to the total number of tasks created. Each process is represented by one or more tasks, depending on thread
+       usage.  This display does not repeat.
+
+       The -t switch adds timestamp to the output.
+
+       The -m switch displays slabinfo.
+
+       The -n switch causes the header to be displayed only once rather than periodically.
+
+       The -s switch displays a table of various event counters and memory statistics. This display does not repeat.
+
+       delay is the delay between updates in seconds.  If no delay is specified, only one report is printed with the average values since boot.
+
+       count is the number of updates.  If no count is specified and delay is defined, count defaults to infinity.
+
+       The -d reports disk statistics (2.5.70 or above required)
+
+       The -w enlarges field width for big memory sizes
+
+       The -p followed by some partition name for detailed statistics (2.5.70 or above required)
+
+       The -S followed by k or K or m or M switches outputs between 1000, 1024, 1000000, or 1048576 bytes
+
+       The -V switch results in displaying version information.
+
+FIELD DESCRIPTION FOR VM MODE
+   Procs
+       r: The number of processes waiting for run time.
+			等待cpu资源的进程数。这个数据比平均负载更加能够体现CPU负载情况，数据中不包含等待IO的进程。如果这个数值大于机器CPU核数，那么机器的CPU资源已经饱和。
+       b: The number of processes in uninterruptible sleep.
+
+   Memory
+       swpd: the amount of virtual memory used.
+       free: the amount of idle memory.
+			系统可用内存数（以千字节为单位），如果剩余内存不足，也会导致系统性能问题。
+       buff: the amount of memory used as buffers.
+       cache: the amount of memory used as cache.
+       inact: the amount of inactive memory. (-a option)
+       active: the amount of active memory. (-a option)
+
+   Swap
+       si: Amount of memory swapped in from disk (/s).
+       so: Amount of memory swapped to disk (/s).
+	交换区写入和读取的数量。如果这个数据不为0，说明系统已经在使用交换区（swap），机器物理内存已经不足。
+
+   IO
+       bi: Blocks received from a block device (blocks/s).
+       bo: Blocks sent to a block device (blocks/s).
+
+   System
+       in: The number of interrupts per second, including the clock.
+       cs: The number of context switches per second.
+
+   CPU
+       These are percentages of total CPU time.
+       us: Time spent running non-kernel code. (user time, including nice time)
+			用户时间
+       sy: Time spent running kernel code. (system time)
+			系统时间
+       id: Time spent idle. Prior to Linux 2.5.41, this includes IO-wait time.
+			空闲时间
+       wa: Time spent waiting for IO. Prior to Linux 2.5.41, included in idle.
+			IO等待时间
+       st: Time stolen from a virtual machine. Prior to Linux 2.6.11, unknown.
+			被投资的时间【一般被其他虚拟机消耗】
+	上述这些CPU时间，可以让我们很快了解CPU是否出于繁忙状态。一般情况下，如果用户时间和系统时间相加非常大，CPU出于忙于执行指令。如果IO等待时间很长，那么系统的瓶颈可能在磁盘IO。
+	
+FIELD DESCRIPTION FOR DISK MODE
+   Reads
+       total: Total reads completed successfully
+       merged: grouped reads (resulting in one I/O)
+       sectors: Sectors read successfully
+       ms: milliseconds spent reading
+
+   Writes
+       total: Total writes completed successfully
+       merged: grouped writes (resulting in one I/O)
+       sectors: Sectors written successfully
+       ms: milliseconds spent writing
+
+   IO
+       cur: I/O in progress
+       s: seconds spent for I/O
+
+FIELD DESCRIPTION FOR DISK PARTITION MODE
+       reads: Total number of reads issued to this partition
+       read sectors: Total read sectors for partition
+       writes : Total number of writes issued to this partition
+       requested writes: Total number of write requests made for partition
+
+FIELD DESCRIPTION FOR SLAB MODE
+       cache: Cache name
+       num: Number of currently active objects
+       total: Total number of available objects
+       size: Size of each object
+       pages: Number of pages with at least one active object
+       totpages: Total number of allocated pages
+       pslab: Number of pages per slab
+
+NOTES
+       vmstat does not require special permissions.
+
+       These reports are intended to help identify system bottlenecks.  Linux vmstat does not count itself as a running process.
+
+       All linux blocks are currently 1024 bytes. Old kernels may report blocks as 512 bytes, 2048 bytes, or 4096 bytes.
+
+       Since procps 3.1.9, vmstat lets you choose units (k, K, m, M) default is K (1024 bytes) in the default mode
+
+       vmstat uses slabinfo 1.1    FIXME
+
+	   
+	   
+	   
+mpstat 
+	mpstat -P ALL 1
+	该命令可以显示每个CPU的占用情况，如果有一个CPU占用率特别高，那么有可能是一个单线程应用程序引起的。
+	
+pidstat
+	pidstat 1
+	
+	
+iostat
+	用于查看机器磁盘IO情况。
+	r/s, w/s, rkB/s, wkB/s：分别表示每秒读写次数和每秒读写数据量（千字节）。读写量过大，可能会引起性能问题。
+	await：IO操作的平均等待时间，单位是毫秒。这是应用程序在和磁盘交互时，需要消耗的时间，包括IO等待和实际操作的耗时。如果这个数值过大，可能是硬件设备遇到了瓶颈或者出现故障。
+	avgqu-sz：向设备发出的请求平均数量。如果这个数值大于1，可能是硬件设备已经饱和（部分前端硬件设备支持并行写入）。
+	%util：设备利用率。这个数值表示设备的繁忙程度，经验值是如果超过60，可能会影响IO性能（可以参照IO操作平均等待时间）。如果到达100%，说明硬件设备已经饱和。
+	
+	
+	
+	
+	
+	
+	
+	
+	

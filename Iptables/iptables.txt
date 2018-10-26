@@ -55,6 +55,10 @@ tables：
             对数据包进行修改，例如给数据包打标记MARK
         nat：   PREROUNTING/OUTPUT/POSTROUNTING      
             主要修改数据包的地址和端口，例如源地址或目标地址
+			包含：DNAT（目标地址转换）、SNAT（源地址转换）、MASQUERADE
+			（1）DNAT操作主要用在这样一种情况，你有一个合法的IP地址，要把对防火墙的访问 重定向到其他的机子上（比如DMZ）。也就是说，我们改变的是目的地址，以使包能重路由到某台主机。
+			（2）SNAT 改变包的源地址，这在极大程度上可以隐藏你的本地网络或者DMZ等。内网到外网的映射。
+			（3）MASQUERADE 的作用和SNAT完全一样，只是计算机的负荷稍微多一点。因为对每个匹配的包，MASQUERADE都要查找可用的IP地址，而不象SNAT用的IP地址是配置好的。
         filter： INPUT/FORWARD/OUTPUT
             实现对数据包的过滤
 
@@ -64,7 +68,8 @@ targets:
 	【ACCEPT, DROP, QUEUE or RETURN】
 	
 	ACCEPT：允许包通过
-	QROP：从底层拒绝包
+	QROP：从底层拒绝包,不做任何操作
+	REJECT：REJECT目标与DROP目标基本相同，但是它也向发送阻塞的数据包的主机发回错误消息
 	QUEUE：将数据包传递给用户空间 【参见NFQUEUE target】
     RETURN；表示停止遍历这个链，并在前一个(调用)链中的下一个规则处继续。 如果到达内置链的末端，或者目标RETURN的内置链中的规则匹配，则由链策略指定的目标将决定数据包的命运。
             
@@ -82,7 +87,7 @@ option：
        -Z  --zero        将表中数据包计数器和流量计数器归零
        -N  --new-chain     创建自定义链
        -X  --delete-chain  删除自定义链
-       -P  --policy
+       -P  --policy		 设置链的默认目标，即策略。 与链中任何规则都不匹配的信息包将强制使用此命令中指定的策略。
        -E  --rename-chain
        -h
 
