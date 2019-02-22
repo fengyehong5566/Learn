@@ -1,0 +1,148 @@
+首先安装openjdk
+	# yum install java-1.8.0-openjdk
+	# export JAVA_HOME=/usr/java 
+	
+	
+软件仓库的配置:
+	# rpm	--import	http://packages.elasticsearch.org/GPG-KEY-elasticsearch
+	# cat	>	/etc/yum.repos.d/logstash.repo	<<EOF
+		[logstash-5.0]
+		name=logstash	repository	for	5.0.x	packages
+		baseurl=http://packages.elasticsearch.org/logstash/5.0/centos
+		gpgcheck=1
+		gpgkey=http://packages.elasticsearch.org/GPG-KEY-elasticsearch
+		enabled=1
+	 EOF
+	# yum	clean	all
+	# yum	install	logstash
+	启动：
+		# initctl start logstash
+	测试：
+		logstash  -e 'input{stdin{}}output{stdout{}}' 
+		回车后，输入hello world，在回车；
+		
+语法：
+	使用{}定义区域，
+	区域可以包含插件区域的定义，一个区域内可以有多个插件，插件区域内可以定义键值对
+	如：
+		input	{
+				stdin{}
+				syslog{}	
+		}
+		
+	数据类型：
+		bool   string   number  array  hash
+		
+	字段引用：
+		在Logstash配置中使用字段的值，只需要把字段的名字写在中括号[]里就行了，这就叫字段引用。
+		
+	条件判断：
+		==    !=   <    >   <=  >=  
+		=~：匹配正则
+		!~：不匹配正则
+		in：包含
+		not in：不包含
+		and：与   
+		or：或    
+		nand：非与    
+		xor：非或
+		()：复合表达式    
+		!()：对复合表达式去反
+		
+		
+install plugin：【通过rubygems平台安装插件】
+	logstash-plugin
+	[root@localhost logstash]# logstash-plugin --help
+	Usage:
+		bin/logstash-plugin [OPTIONS] SUBCOMMAND [ARG] ...
+		Parameters:
+			SUBCOMMAND                    subcommand
+			[ARG] ...                     subcommand arguments
+		Subcommands:
+			list                      List all installed Logstash plugins
+			install                   Install a Logstash plugin
+			remove                    Remove a Logstash plugin
+			update                    Update a plugin
+			pack                      Package currently installed plugins, Deprecated: Please use prepare-offline-pack instead
+			unpack                    Unpack packaged plugins, Deprecated: Please use prepare-offline-pack instead
+			generate                  Create the foundation for a new plugin
+			uninstall                 Uninstall a plugin. Deprecated: Please use remove instead
+			prepare-offline-pack      Create an archive of specified plugins to use for offline installation
+		Options:
+			-h, --help                print help
+	
+	本地插件安装：
+		bin/logstash-plugin	install	/path/to/logstash-filter-crash.gem
+	
+	成功后：
+		Gemfile	文件最后会多出一段内容：
+		gem	"logstash-filter-crash",	"1.1.0",	:path	=>	"vendor/local_gems/d354312c/logstash-filter-mweibocrash-1.1.0"
+		
+		Gemfile.jruby-1.9.lock	文件开头也会多出一段内容：
+			PATH
+				remote:	vendor/local_gems/d354312c/logstash-filter-crash-1.1.0
+				specs:
+					logstash-filter-crash	(1.1.0)
+					logstash-core	(>=	1.4.0,	<	2.0.0)
+	
+	
+input插件：
+	logsta配置一定要有一个input和一个output。
+	
+读取文件（file）：
+	Logstash使用一个名叫FileWatch的Ruby	Gem库来监听文件变化。
+	这个库支持glob展开文件路径，而且会记录一个叫.sincedb的数据库文件来跟踪被监听的日志文件的当前读取位置。所以，不要担心logstash会漏过你的数据。	
+	sincedb	文件中记录了每个被监听的文件的inode,major number,minor number和pos。
+	
+	
+	
+logstash
+	-e：执行
+	-f：【--config】    logstash -f /etc/logstash.d/*.conf
+	-t：【--configtest】   测试配置文件是否有错误
+	-l：【--log】  Logstash	默认输出日志到标准错误。生产环境下你可以通过
+			bin/logstash	-l	logs/logstash.log		命令来统一存储日志。
+	
+	-w：【--pipeline-workers】运行filter和output的pipeline线程数量。默认是CPU核数。
+	-b：【--pipeline-batch-size】每个Logstash	pipeline线程，
+		在执行具体的filter和output函数之前，最多能累积的日志条数。默认是125条。越大性能越好，同样也会消耗越多的JVM内存。
+	-u：【--pipeline-batch-delay】每个Logstash	pipeline线程，在打包批量日志的时候，最多等待几毫秒。默认是5ms
+	-P：【--pluginpath】	可以写自己的插件，然后用bin/logstash --pluginpath  /path/to/own/plugins 加载它们。
+	--verbose：输出一定的调试日志。
+	--debug：输出更多的调试日志。
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

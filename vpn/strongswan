@@ -1,0 +1,495 @@
+strongswan
+
+./configure --prefix= --sysconfdir=/etc  --enable-openssl --enable-nat-transport  --enable-shared --enable-md4 --enable-eap-mschapv2 --enable-eap-aka --enable-eap-aka-3gpp2  --enable-eap-gtc --enable-eap-identity --enable-eap-md5 --enable-eap-peap --enable-eap-radius --enable-eap-sim --enable-eap-sim-file --enable-eap-simaka-pseudonym --enable-eap-simaka-reauth --enable-eap-simaka-sql --enable-eap-tls --enable-eap-tnc --enable-eap-ttls
+
+
+
+./configure --prefix= --sysconfdir=/etc  --enable-openssl --enable-nat-transport  --enable-shared --enable-md4 --enable-eap-mschapv2 --enable-eap-aka --enable-eap-aka-3gpp2  --enable-eap-gtc --enable-eap-identity --enable-eap-md5 --enable-eap-peap --enable-eap-radius --enable-eap-sim --enable-eap-sim-file --enable-eap-simaka-pseudonym --enable-eap-simaka-reauth --enable-eap-simaka-sql --enable-eap-tls --enable-eap-tnc --enable-eap-ttls
+
+
+
+
+
+-A FORWARD -s 10.0.20.0/24 -d 10.10.10.0/24 -i eth0 -m policy --dir in --pol ipsec --reqid 8554 --proto esp -j ACCEPT 
+-A FORWARD -s 10.10.10.0/24 -d 10.0.20.0/24 -o eth0 -m policy --dir out --pol ipsec --reqid 8554 --proto esp -j ACCEPT 
+
+
+
+
+
+
+
+
+
+
+
+
+Usage: ./configure [OPTION]... [VAR=VALUE]...
+
+To assign environment variables (e.g., CC, CFLAGS...), specify them as
+VAR=VALUE.  See below for descriptions of some of the useful variables.
+
+Defaults for the options are specified in brackets.
+
+Configuration:
+  -h, --help              display this help and exit
+      --help=short        display options specific to this package
+      --help=recursive    display the short help of all the included packages
+  -V, --version           display version information and exit
+  -q, --quiet, --silent   do not print `checking ...' messages
+      --cache-file=FILE   cache test results in FILE [disabled]
+  -C, --config-cache      alias for `--cache-file=config.cache'
+  -n, --no-create         do not create output files
+      --srcdir=DIR        find the sources in DIR [configure dir or `..']
+
+Installation directories:
+  --prefix=PREFIX         install architecture-independent files in PREFIX
+                          [/usr/local]
+  --exec-prefix=EPREFIX   install architecture-dependent files in EPREFIX
+                          [PREFIX]
+
+By default, `make install' will install all the files in
+`/usr/local/bin', `/usr/local/lib' etc.  You can specify
+an installation prefix other than `/usr/local' using `--prefix',
+for instance `--prefix=$HOME'.
+
+For better control, use the options below.
+
+Fine tuning of the installation directories:
+  --bindir=DIR            user executables [EPREFIX/bin]
+  --sbindir=DIR           system admin executables [EPREFIX/sbin]
+  --libexecdir=DIR        program executables [EPREFIX/libexec]
+  --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
+  --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
+  --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
+  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
+  --libdir=DIR            object code libraries [EPREFIX/lib]
+  --includedir=DIR        C header files [PREFIX/include]
+  --oldincludedir=DIR     C header files for non-gcc [/usr/include]
+  --datarootdir=DIR       read-only arch.-independent data root [PREFIX/share]
+  --datadir=DIR           read-only architecture-independent data [DATAROOTDIR]
+  --infodir=DIR           info documentation [DATAROOTDIR/info]
+  --localedir=DIR         locale-dependent data [DATAROOTDIR/locale]
+  --mandir=DIR            man documentation [DATAROOTDIR/man]
+  --docdir=DIR            documentation root [DATAROOTDIR/doc/strongswan]
+  --htmldir=DIR           html documentation [DOCDIR]
+  --dvidir=DIR            dvi documentation [DOCDIR]
+  --pdfdir=DIR            pdf documentation [DOCDIR]
+  --psdir=DIR             ps documentation [DOCDIR]
+
+Program names:
+  --program-prefix=PREFIX            prepend PREFIX to installed program names
+  --program-suffix=SUFFIX            append SUFFIX to installed program names
+  --program-transform-name=PROGRAM   run sed PROGRAM on installed program names
+
+System types:
+  --build=BUILD     configure for building on BUILD [guessed]
+  --host=HOST       cross-compile to build programs to run on HOST [BUILD]
+
+Optional Features:
+  --disable-option-checking  ignore unrecognized --enable/--with options
+  --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
+  --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+  --enable-silent-rules   less verbose build output (undo: "make V=1")
+  --disable-silent-rules  verbose build output (undo: "make V=0")
+  --disable-aes           disable AES software implementation plugin.
+  --enable-af-alg         enable AF_ALG crypto interface to Linux Crypto API.
+  --enable-bliss          enable BLISS software implementation plugin.
+  --enable-blowfish       enable Blowfish software implementation plugin.
+  --enable-ccm            enables the CCM AEAD wrapper crypto plugin.
+  --enable-chapoly        enables the ChaCha20/Poly1305 AEAD plugin.
+  --disable-cmac          disable CMAC crypto implementation plugin.
+  --enable-ctr            enables the Counter Mode wrapper crypto plugin.
+  --disable-des           disable DES/3DES software implementation plugin.
+  --disable-fips-prf      disable FIPS PRF software implementation plugin.
+  --enable-gcm            enables the GCM AEAD wrapper crypto plugin.
+  --enable-gcrypt         enables the libgcrypt plugin.
+  --disable-gmp           disable GNU MP (libgmp) based crypto implementation
+                          plugin.
+  --disable-curve25519    disable Curve25519 Diffie-Hellman plugin.
+  --disable-hmac          disable HMAC crypto implementation plugin.
+  --enable-md4            enable MD4 software implementation plugin.
+  --disable-md5           disable MD5 software implementation plugin.
+  --enable-mgf1           enable the MGF1 software implementation plugin.
+  --enable-newhope        enable New Hope crypto plugin.
+  --disable-nonce         disable nonce generation plugin.
+  --enable-ntru           enables the NTRU crypto plugin.
+  --enable-openssl        enables the OpenSSL crypto plugin.
+  --enable-padlock        enables VIA Padlock crypto plugin.
+  --disable-random        disable RNG implementation on top of /dev/(u)random.
+  --disable-rc2           disable RC2 software implementation plugin.
+  --enable-rdrand         enable Intel RDRAND random generator plugin.
+  --enable-aesni          enable Intel AES-NI crypto plugin.
+  --disable-sha1          disable SHA1 software implementation plugin.
+  --disable-sha2          disable SHA256/SHA384/SHA512 software implementation
+                          plugin.
+  --enable-sha3           enable SHA3_224/SHA3_256/SHA3_384/SHA3_512 software
+                          implementation plugin.
+  --disable-xcbc          disable xcbc crypto implementation plugin.
+  --disable-dnskey        disable DNS RR key decoding plugin.
+  --disable-pem           disable PEM decoding plugin.
+  --disable-pgp           disable PGP key decoding plugin.
+  --disable-pkcs1         disable PKCS1 key decoding plugin.
+  --disable-pkcs7         disable PKCS7 container support plugin.
+  --disable-pkcs8         disable PKCS8 private key decoding plugin.
+  --disable-pkcs12        disable PKCS12 container support plugin.
+  --disable-pubkey        disable RAW public key support plugin.
+  --disable-sshkey        disable SSH key decoding plugin.
+  --disable-x509          disable X509 certificate implementation plugin.
+  --enable-curl           enable CURL fetcher plugin to fetch files via
+                          libcurl. Requires libcurl.
+  --enable-files          enable simple file:// URI fetcher.
+  --enable-ldap           enable LDAP fetching plugin to fetch files via
+                          libldap. Requires openLDAP.
+  --enable-soup           enable soup fetcher plugin to fetch from HTTP via
+                          libsoup. Requires libsoup.
+  --enable-unbound        enable UNBOUND resolver plugin to perform DNS
+                          queries via libunbound. Requires libldns and
+                          libunbound.
+  --enable-winhttp        enable WinHTTP based HTTP/HTTPS fetching plugin.
+  --enable-mysql          enable MySQL database support. Requires
+                          libmysqlclient_r.
+  --enable-sqlite         enable SQLite database support. Requires libsqlite3.
+  --enable-addrblock      enables RFC 3779 address block constraint support.
+  --enable-acert          enable X509 attribute certificate checking plugin.
+  --enable-agent          enables the ssh-agent signing plugin.
+  --disable-constraints   disable advanced X509 constraint checking plugin.
+  --enable-coupling       enable IKEv2 plugin to couple peer certificates
+                          permanently to authentication.
+  --enable-dnscert        enable DNSCERT authentication plugin.
+  --enable-eap-sim        enable SIM authentication module for EAP.
+  --enable-eap-sim-file   enable EAP-SIM backend based on a triplet file.
+  --enable-eap-sim-pcsc   enable EAP-SIM backend based on a smartcard reader.
+                          Requires libpcsclite.
+  --enable-eap-aka        enable EAP AKA authentication module.
+  --enable-eap-aka-3gpp2  enable EAP AKA backend implementing 3GPP2 algorithms
+                          in software. Requires libgmp.
+  --enable-eap-simaka-sql enable EAP-SIM/AKA backend based on a
+                          triplet/quintuplet SQL database.
+  --enable-eap-simaka-pseudonym
+                          enable EAP-SIM/AKA pseudonym storage plugin.
+  --enable-eap-simaka-reauth
+                          enable EAP-SIM/AKA reauthentication data storage
+                          plugin.
+  --enable-eap-identity   enable EAP module providing EAP-Identity helper.
+  --enable-eap-md5        enable EAP MD5 (CHAP) authentication module.
+  --enable-eap-gtc        enable EAP GTC authentication module.
+  --enable-eap-mschapv2   enable EAP MS-CHAPv2 authentication module.
+  --enable-eap-tls        enable EAP TLS authentication module.
+  --enable-eap-ttls       enable EAP TTLS authentication module.
+  --enable-eap-peap       enable EAP PEAP authentication module.
+  --enable-eap-tnc        enable EAP TNC trusted network connect module.
+  --enable-eap-dynamic    enable dynamic EAP proxy module.
+  --enable-eap-radius     enable RADIUS proxy authentication module.
+  --enable-ext-auth       enable plugin calling an external authorization
+                          script.
+  --enable-ipseckey       enable IPSECKEY authentication plugin.
+  --enable-keychain       enables OS X Keychain Services credential set.
+  --enable-pkcs11         enables the PKCS11 token support plugin.
+  --enable-tpm            enables the TPM plugin.
+  --disable-revocation    disable X509 CRL/OCSP revocation check plugin.
+  --enable-whitelist      enable peer identity whitelisting plugin.
+  --disable-xauth-generic disable generic XAuth backend.
+  --enable-xauth-eap      enable XAuth backend using EAP methods to verify
+                          passwords.
+  --enable-xauth-pam      enable XAuth backend using PAM to verify passwords.
+  --enable-xauth-noauth   enable XAuth pseudo-backend that does not actually
+                          verify or even request any credentials.
+  --disable-kernel-netlink
+                          disable the netlink kernel interface.
+  --enable-kernel-pfkey   enable the PF_KEY kernel interface.
+  --enable-kernel-pfroute enable the PF_ROUTE kernel interface.
+  --enable-kernel-iph     enable the Windows IP Helper based networking
+                          backend.
+  --enable-kernel-libipsec
+                          enable the libipsec kernel interface.
+  --enable-kernel-wfp     enable the Windows Filtering Platform IPsec backend.
+  --disable-socket-default
+                          disable default socket implementation for charon.
+  --enable-socket-dynamic enable dynamic socket implementation for charon
+  --enable-socket-win     enable Winsock2 based socket implementation for
+                          charon
+  --disable-stroke        disable charons stroke configuration backend.
+  --enable-smp            enable SMP configuration and control interface.
+                          Requires libxml.
+  --enable-sql            enable SQL database configuration backend.
+  --enable-uci            enable OpenWRT UCI configuration plugin.
+  --disable-vici          disable strongSwan IKE generic IPC interface plugin.
+  --enable-android-dns    enable Android specific DNS handler.
+  --disable-attr          disable strongswan.conf based configuration
+                          attribute plugin.
+  --enable-attr-sql       enable SQL based configuration attribute plugin.
+  --enable-dhcp           enable DHCP based attribute provider plugin.
+  --enable-osx-attr       enable OS X SystemConfiguration attribute handler.
+  --enable-p-cscf         enable plugin to request P-CSCF server addresses
+                          from an ePDG.
+  --disable-resolve       disable resolve DNS handler plugin.
+  --enable-unity          enables Cisco Unity extension plugin.
+  --enable-imc-test       enable IMC test module.
+  --enable-imv-test       enable IMV test module.
+  --enable-imc-scanner    enable IMC port scanner module.
+  --enable-imv-scanner    enable IMV port scanner module.
+  --enable-imc-os         enable IMC operating system module.
+  --enable-imv-os         enable IMV operating system module.
+  --enable-imc-attestation
+                          enable IMC attestation module.
+  --enable-imv-attestation
+                          enable IMV attestation module.
+  --enable-imc-swid       enable IMC swid module.
+  --enable-imv-swid       enable IMV swid module.
+  --enable-imc-hcd        enable IMC hcd module.
+  --enable-imv-hcd        enable IMV hcd module.
+  --enable-tnc-ifmap      enable TNC IF-MAP module. Requires libxml
+  --enable-tnc-imc        enable TNC IMC module.
+  --enable-tnc-imv        enable TNC IMV module.
+  --enable-tnc-pdp        enable TNC policy decision point module.
+  --enable-tnccs-11       enable TNCCS 1.1 protocol module. Requires libxml
+  --enable-tnccs-20       enable TNCCS 2.0 protocol module.
+  --enable-tnccs-dynamic  enable dynamic TNCCS protocol discovery module.
+  --enable-android-log    enable Android specific logger plugin.
+  --enable-bypass-lan     enable plugin to install bypass policies for local
+                          subnets.
+  --enable-certexpire     enable CSV export of expiration dates of used
+                          certificates.
+  --enable-connmark       enable connmark plugin using conntrack based marks
+                          to select return path SA.
+  --enable-forecast       enable forecast plugin forwarding
+                          broadcast/multicast messages.
+  --enable-duplicheck     advanced duplicate checking plugin using liveness
+                          checks.
+  --enable-error-notify   enable error notification plugin.
+  --enable-farp           enable ARP faking plugin that responds to ARP
+                          requests to peers virtual IP
+  --enable-ha             enable high availability cluster plugin.
+  --enable-led            enable plugin to control LEDs on IKEv2 activity
+                          using the Linux kernel LED subsystem.
+  --enable-load-tester    enable load testing plugin for IKEv2 daemon.
+  --enable-lookip         enable fast virtual IP lookup and notification
+                          plugin.
+  --enable-radattr        enable plugin to inject and process custom RADIUS
+                          attributes as IKEv2 client.
+  --enable-systime-fix    enable plugin to handle cert lifetimes with invalid
+                          system time gracefully.
+  --enable-test-vectors   enable plugin providing crypto test vectors.
+  --disable-updown        disable updown firewall script plugin.
+  --enable-aikgen         enable AIK generator for TPM 1.2.
+  --disable-charon        disable the IKEv1/IKEv2 keying daemon charon.
+  --enable-cmd            enable the command line IKE client charon-cmd.
+  --enable-conftest       enforce Suite B conformance test framework.
+  --enable-dumm           enable the DUMM UML test framework.
+  --enable-fast           enable libfast (FastCGI Application Server w/
+                          templates.
+  --enable-libipsec       enable user space IPsec implementation.
+  --enable-manager        enable web management console (proof of concept).
+  --enable-medcli         enable mediation client configuration database
+                          plugin.
+  --enable-medsrv         enable mediation server web frontend and daemon
+                          plugin.
+  --enable-nm             enable NetworkManager backend.
+  --disable-pki           disable pki certificate utility.
+  --disable-scepclient    disable SCEP client tool.
+  --disable-scripts       disable additional utilities (found in directory
+                          scripts).
+  --enable-svc            enable charon Windows service.
+  --enable-systemd        enable systemd specific IKE daemon charon-systemd.
+  --disable-swanctl       disable swanctl configuration and control tool.
+  --enable-tkm            enable Trusted Key Manager support.
+  --enable-bfd-backtraces use binutils libbfd to resolve backtraces for memory
+                          leaks and segfaults.
+  --enable-dbghelp-backtraces
+                          use dbghlp.dll on Windows to create and print
+                          backtraces for memory leaks and segfaults.
+  --disable-ikev1         disable IKEv1 protocol support in charon.
+  --disable-ikev2         disable IKEv2 protocol support in charon.
+  --enable-integrity-test enable integrity testing of libstrongswan and
+                          plugins.
+  --disable-load-warning  disable the charon plugin load option warning in
+                          starter.
+  --enable-mediation      enable IKEv2 Mediation Extension.
+  --enable-unwind-backtraces
+                          use libunwind to create backtraces for memory leaks
+                          and segfaults.
+  --enable-ruby-gems      enable build of provided ruby gems.
+  --enable-ruby-gems-install
+                          enable installation of provided ruby gems.
+  --enable-python-eggs    enable build of provided python eggs.
+  --enable-python-eggs-install
+                          enable installation of provided python eggs.
+  --enable-perl-cpan      enable build of provided perl CPAN module.
+  --enable-perl-cpan-install
+                          enable installation of provided CPAN module.
+  --enable-tss-trousers   enable the use of the TrouSerS Trusted Software
+                          Stack
+  --enable-tss-tss2       enable the use of the TSS 2.0 Trusted Software Stack
+  --enable-coverage       enable lcov coverage report generation.
+  --enable-leak-detective enable malloc hooks to find memory leaks.
+  --enable-lock-profiler  enable lock/mutex profiling code.
+  --enable-log-thread-ids use thread ID, if available, instead of an
+                          incremented value starting from 1, to identify
+                          threads.
+  --enable-monolithic     build monolithic version of libstrongswan that
+                          includes all enabled plugins. Similarly, the plugins
+                          of charon are assembled in libcharon.
+  --disable-defaults      disable all default plugins (they can be enabled
+                          with their respective --enable options)
+  --enable-all            enable all plugins and features (they can be
+                          disabled with their respective --disable options).
+                          Mainly for testing.
+  --enable-dependency-tracking
+                          do not reject slow dependency extractors
+  --disable-dependency-tracking
+                          speeds up one-time build
+  --enable-shared[=PKGS]  build shared libraries [default=yes]
+  --enable-static[=PKGS]  build static libraries [default=yes]
+  --enable-fast-install[=PKGS]
+                          optimize for fast installation [default=yes]
+  --disable-libtool-lock  avoid locking (might break parallel builds)
+
+Optional Packages:
+  --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
+  --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-random-device=arg
+                          set the device to read real random data from
+                          (default: /dev/random).
+  --with-urandom-device=arg
+                          set the device to read pseudo random data from
+                          (default: /dev/urandom).
+  --with-strongswan-conf=arg
+                          set the strongswan.conf file location (default:
+                          ${sysconfdir}/strongswan.conf).
+  --with-resolv-conf=arg  set the file to use in DNS handler plugin (default:
+                          ${sysconfdir}/resolv.conf).
+  --with-piddir=arg       set path for PID and UNIX socket files (default:
+                          /var/run).
+  --with-ipsecdir=arg     set installation path for ipsec tools (default:
+                          ${libexecdir%/}/ipsec).
+  --with-ipseclibdir=arg  set installation path for ipsec libraries (default:
+                          ${libdir%/}/ipsec).
+  --with-plugindir=arg    set the installation path of plugins (default:
+                          ${ipseclibdir%/}/plugins).
+  --with-imcvdir=arg      set the installation path of IMC and IMV dynamic
+                          librariers (default: ${ipseclibdir%/}/imcvs).
+  --with-nm-ca-dir=arg    directory the NM backend uses to look up trusted
+                          root certificates (default:
+                          /usr/share/ca-certificates).
+  --with-swanctldir=arg   base directory for swanctl configuration files and
+                          credentials (default: ${sysconfdir}/swanctl).
+  --with-linux-headers=arg
+                          set directory of linux header files to use (default:
+                          \${top_srcdir}/src/include).
+  --with-routing-table=arg
+                          set routing table to use for IPsec routes (default:
+                          220).
+  --with-routing-table-prio=arg
+                          set priority for IPsec routing table (default: 220).
+  --with-ipsec-script=arg change the name of the ipsec script (default:
+                          ipsec).
+  --with-fips-mode=arg    set openssl FIPS mode: disabled(0), enabled(1),
+                          Suite B enabled(2) (default: 0).
+  --with-capabilities=arg set capability dropping library. Currently supported
+                          values are "libcap" and "native" (default: no).
+  --with-mpz_powm_sec=arg use the more side-channel resistant mpz_powm_sec in
+                          libgmp, if available (default: yes).
+  --with-dev-headers=arg  install strongSwan development headers to directory.
+                          (default: no).
+  --with-printf-hooks=arg force the use of a specific printf hook
+                          implementation (auto, builtin, glibc, vstr).
+                          (default: auto).
+  --with-rubygemdir=arg   path to install ruby gems to (default: "gem
+                          environment gemdir").
+  --with-pythoneggdir=arg path to install python eggs to to (default: "main
+                          site-packages directory").
+  --with-systemdsystemunitdir=arg
+                          directory for systemd service files (default:
+                          $systemdsystemunitdir_default).
+  --with-user=user        change user of the daemons to "user" after startup
+                          (default is "root").
+  --with-group=group      change group of the daemons to "group" after startup
+                          (default is "root").
+  --with-charon-udp-port=port
+                          UDP port used by charon locally (default 500). Set
+                          to 0 to allocate randomly.
+  --with-charon-natt-port=port
+                          UDP port used by charon locally in case a NAT is
+                          detected (must be different from charon-udp-port,
+                          default 4500). Set to 0 to allocate randomly.
+  --with-lib-prefix[=DIR] search for libraries in DIR/include and DIR/lib
+  --without-lib-prefix    don't search for libraries in includedir and libdir
+  --with-pic[=PKGS]       try to use only PIC/non-PIC objects [default=use
+                          both]
+  --with-aix-soname=aix|svr4|both
+                          shared library versioning (aka "SONAME") variant to
+                          provide on AIX, [default=aix].
+  --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
+  --with-sysroot[=DIR]    Search for dependent libraries within DIR (or the
+                          compiler's sysroot if not specified).
+
+Some influential environment variables:
+  PKG_CONFIG  path to pkg-config utility
+  PKG_CONFIG_PATH
+              directories to add to pkg-config's search path
+  PKG_CONFIG_LIBDIR
+              path overriding pkg-config's built-in search path
+  CC          C compiler command
+  CFLAGS      C compiler flags
+  LDFLAGS     linker flags, e.g. -L<lib dir> if you have libraries in a
+              nonstandard directory <lib dir>
+  LIBS        libraries to pass to the linker, e.g. -l<library>
+  CPPFLAGS    (Objective) C/C++ preprocessor flags, e.g. -I<include dir> if
+              you have headers in a nonstandard directory <include dir>
+  CPP         C preprocessor
+  LT_SYS_LIBRARY_PATH
+              User-defined run-time library search path.
+  YACC        The `Yet Another Compiler Compiler' implementation to use.
+              Defaults to the first program found out of: `bison -y', `byacc',
+              `yacc'.
+  YFLAGS      The list of arguments that will be passed by default to $YACC.
+              This script will default YFLAGS to the empty string to avoid a
+              default value of `-d' given by some make applications.
+  PYTHON      the Python interpreter
+  soup_CFLAGS C compiler flags for soup, overriding pkg-config
+  soup_LIBS   linker flags for soup, overriding pkg-config
+  xml_CFLAGS  C compiler flags for xml, overriding pkg-config
+  xml_LIBS    linker flags for xml, overriding pkg-config
+  systemd_CFLAGS
+              C compiler flags for systemd, overriding pkg-config
+  systemd_LIBS
+              linker flags for systemd, overriding pkg-config
+  systemd_daemon_CFLAGS
+              C compiler flags for systemd_daemon, overriding pkg-config
+  systemd_daemon_LIBS
+              linker flags for systemd_daemon, overriding pkg-config
+  systemd_journal_CFLAGS
+              C compiler flags for systemd_journal, overriding pkg-config
+  systemd_journal_LIBS
+              linker flags for systemd_journal, overriding pkg-config
+  tss2_CFLAGS C compiler flags for tss2, overriding pkg-config
+  tss2_LIBS   linker flags for tss2, overriding pkg-config
+  json_CFLAGS C compiler flags for json, overriding pkg-config
+  json_LIBS   linker flags for json, overriding pkg-config
+  gtk_CFLAGS  C compiler flags for gtk, overriding pkg-config
+  gtk_LIBS    linker flags for gtk, overriding pkg-config
+  pcsclite_CFLAGS
+              C compiler flags for pcsclite, overriding pkg-config
+  pcsclite_LIBS
+              linker flags for pcsclite, overriding pkg-config
+  nm_CFLAGS   C compiler flags for nm, overriding pkg-config
+  nm_LIBS     linker flags for nm, overriding pkg-config
+  libiptc_CFLAGS
+              C compiler flags for libiptc, overriding pkg-config
+  libiptc_LIBS
+              linker flags for libiptc, overriding pkg-config
+
+Use these variables to override the choices made by `configure' or to help
+it to find libraries and programs with nonstandard names/locations.
+
+Report bugs to the package provider.
+
+
+
+
+
+
+
+
+
