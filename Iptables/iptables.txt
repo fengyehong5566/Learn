@@ -93,7 +93,7 @@ option：
 
     PARAMETERS：
        [!] -p, --protocol protocol/numeric
-             tcp,  udp,  udplite,  icmp,  esp, ah, sctp, all
+             可指定值：tcp,  udp,  udplite,  icmp,  esp, ah, sctp, all
              A protocol name from /etc/protocols is also allowed.  
        [!] -s, --source address[/mask][,...]
               --src 
@@ -207,11 +207,19 @@ option：
     Mac match
     Mark match
     Multiport match
+        --source-ports,--sports
+        --destination-ports,--dports
+        --ports
     Owner match
     Packet type match
     Realm match
     Recent match
     State match
+        --state, state是要匹配的连接状态的逗号分隔列表。
+            INVALID: 意味着由于某些原因无法识别数据包，包括内存不足和与任何已知连接不对应的ICMP错误
+            ESTABLISHED: 意味着由于某些原因无法识别数据包，包括内存不足和与任何已知连接不对应的ICMP错误
+            NEW: 意味着由于某些原因无法识别数据包，包括内存不足和与任何已知连接不对应的ICMP错误
+            RELATED: 表示数据包正在启动新连接，但与现有连接相关联
     Tcpmss match
     Tos match
     Ttl match
@@ -398,9 +406,12 @@ MATCH EXTENSIONS 【扩展匹配】
         --strict 
             选择是否匹配给出的精确策略，或如果给出任何规则策略，则匹配
         [!] --reqid id
+            匹配策略规则的reqid。 可以使用unique：id作为级别使用setkey（8）指定reqid。
         [!] --spi spi
         [!] --proto {ah|esp|ipcomp}
+            匹配的封装协议
         [!] --mode {tunnel|transport}
+            匹配的封装模式
         [!] --tunnel-src addr[/mask]
             匹配隧道模式SA的源端点地址。【仅和“--mode tunnel”一起有效】
         [!] --tunnel-dst addr[/mask]
