@@ -1,0 +1,108 @@
+1、Linux启动大致过程？
+  1）POST：通电自检
+  2）BIOS:BOIS自检，加载硬盘
+  3）读取MBR，进行MBR引导
+  4）grub引导菜单
+  5）加载内核 Kernel（ramdisk)
+  6）启动init进程，依据inittab文件设定运行级别
+  7）init进程，执行rc.sysinit文件
+  8）启动内核模块，执行不同级别的脚本程序
+  9）执行/etc/rc.d/rc.local
+  10）启动mingetty，进入系统登陆界面
+  
+  
+2、apache有几种工作模式，分别简述两种工作模式及其优缺点？
+  apache主要有两种工作模式：prefork(apache的默认安装模式)和worker(可以在编译的时候添加–with-mpm=worker选项)
+  prefork的特点是：
+    1.这种模式可以不必在请求到来时再产生新的进程，从而减小了系统开销
+    2.可以防止意外的内存泄漏
+    3.在服务器负载下降的时候会自动减少子进程数
+  
+  worker的特点是：支持混合的多线程多进程的多路处理模块
+  如果对于一个高流量的HTTP服务器，worker MPM是一个比较好的选择，因为worker MPM占用的内存要比prefork要小。
+  
+  
+3、LVS三种模式的工作过程？
+  NAT (Network Address Translation)模式。LB收到用户请求包后，LB将请求包中虚拟服务器的IP地址转换为某个选定RS的IP地址，转发给RS；RS将应答包发给 LB，LB将应答包中RS的IP转为虚拟服务器的IP地址，回送给用户。
+  
+  IP隧道 (IP Tunneling)模式。LB收到用户请求包后，根据IP隧道协议封装该包，然后传给某个选定的RS；RS解出请求信息，直接将应答内容传给用户。此时要求RS和LB都要支持IP隧道协议。
+  
+  DR(Direct Routing)模式。LB收到请求包后，将请求包中目标MAC地址转换为某个选定RS的MAC地址后将包转发出去，RS收到请求包后 ,可直接将应答内容传给用户。此时要求LB和所有RS都必须在一个物理段内,且LB与RS群共享一个虚拟IP。
+  
+  
+4、简述/etc/fstab里面个字段的含义？
+  因为mount挂载在重启服务器后会失效，所以需要将分区信息写到/etc/fstab文件中让它永久挂载：
+    磁盘分区  <mount point> <type>   <options> <dump> <pass>
+    /dev/sdb1  /mnt/david  ext4     defaults     0     0
+  
+  <dump>: 此处为1的话，表示要将整个<fie sysytem>里的内容备份；为0的话，表示不备份。现在很少用到dump这个工具，在这里一般选0。
+  <pass>: 指定如何使用fsck来检查硬盘。
+          a、如果这里填0，则不检查；
+          b、挂载点为 / 的（即根分区），必须在这里填写1，其他的都不能填写1。
+          c、如果有分区填写大于1的话，则在检查完根分区后，接着按填写的数字从小到大依次检查下去。
+             相同数字的同时检查。比如第一和第二个分区填写2，第三和第四个分区填写3，则系统在检查完根分区后，接着同时检查第一和第二个分区，然后再同时检查第三和第四个 分区。
+  
+
+5、Apache设置虚拟目录的字段？
+
+  NameVirtualHost 192.168.1.2 //设置域名虚拟主机使用的IP地址
+  <VirtualHost 192.168.1.2:80> //建立在地址上的虚拟主机区域
+  ServerName www.sfzhang.com //虚拟主页说使用的域名
+  DocumentRoot /data/vhosts/sfzhang //建立虚拟主机所使用的文档根目录
+
+6、一个EXT3的文件分区，当用touch新建文件时报错，错误信息是磁盘已满，但是使用df -H查看分区信息时只使用了50%，请分析具体原因？
+
+  答：两种情况，一种是磁盘配额问题（quota），另外一种就是EXT3文件系统的设计不适合很多小文件跟大文件的一种文件格式，出现很多小文件时，容易导致inode耗尽了。
+
+7、请使用Linux系统命令统计出establish状态的连接数有多少?
+
+  netstat -anput  |grep ESTABLISHED |wc -l
+
+8、mysql数据库的备份还原是怎么做的？
+
+  答：平时采用两种方法来做：
+    1）利用mysql自带的使用工具mysqldump和mysql来备份还原数据库
+    2）利用第三方的mysql管理工具比如：mysqladmin
+    3）停止mysqld服务拷贝数据文件
+
+9、Linux系统是由那些部分组成？
+  Linux系统内核，shell，文件系统和应用程序四部分组成。  
+  
+10、查看本机正在监控的端口  
+  netstat -anptu | grep  -i "listen"
+  
+11、统计服务器上各个状态（ESTABLISHED/SYN_SENT/SYN_RECV等）的个数
+  netstat  -anpt | awk '{print $NF}' |  sort  -r | uniq -c
+  
+12、统计web日志access.log文件中出现次数排名前十的ip和次数
+  日志格式：
+    122.226.185.90 - - [06/Feb/2018:22:56:17 +0800] "GET / HTTP/1.1" 400 173 "-" "-"
+  答： awk '{i=$1;count[i]++} END{for (i in count)print(i,count[i])}'  access.log
+
+13、查找/usr/local/apache/logs 目录下最后修改时间大于30天的文件，并删除。
+  find /usr/loca/apache/logs/   -type f -mtime +30  -exec rm -f {} \;
+  
+14、添加一条到192.168.10.0/24的路由，网关为192.168.1.254
+  route add -net 192.168.10.0/24 gw 192.168.1.254
+  or   route add -net 192.168.10.0 netmark 255.255.255.0 gw 192.168.1.254
+
+15、 利用sed命令把file.txt中所有的换行换成空格
+  sed ":a;N;s/\n//g;ta" file
+  或者     sed ":a;N;s/\n//g;ba" file
+  
+  详解：https://blog.csdn.net/fengyuanye/article/details/87912630
+  
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
