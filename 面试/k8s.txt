@@ -296,14 +296,15 @@
     RoundRobin：默认为轮询模式，即轮询将请求转发到后端的各个Pod上。
     SessionAffinity：基于客户端IP地址进行会话保持的模式，即第1次将某个客户端发起的请求转发到后端的某个Pod上，之后从相同的客户端发起的请求都将被转发到后端相同的Pod上。
 
-49、简述Kubernetes外部如何访问集群内的服务？
+# 简述Kubernetes外部如何访问集群内的服务？
   对于Kubernetes，集群外的客户端默认情况，无法通过Pod的IP地址或者Service的虚拟IP地址:虚拟端口号进行访问。
   通常可以通过以下方式进行访问Kubernetes集群内的服务：
     映射Pod到物理机：将Pod端口号映射到宿主机，即在Pod中采用hostPort方式，以使客户端应用能够通过物理机访问容器应用。
     映射Service到物理机：将Service端口号映射到宿主机，即在Service中采用nodePort方式，以使客户端应用能够通过物理机访问容器应用。
     映射Sercie到LoadBalancer：通过设置LoadBalancer映射到云服务商提供的LoadBalancer地址。这种用法仅用于在公有云服务提供商的云平台上设置Service的场景。
 
-50、简述Kubernetes ingress？
+
+# 简述Kubernetes ingress？
   Kubernetes的Ingress资源对象，用于将不同URL的访问请求转发到后端不同的Service，以实现HTTP层的业务路由机制。
 
   Kubernetes使用了Ingress策略和Ingress Controller，两者结合并实现了一个完整的Ingress负载均衡器。使用Ingress进行负载分发时，Ingress Controller基于Ingress规则将  \
@@ -311,8 +312,8 @@
 
   同时当Ingress Controller提供的是对外服务，则实际上实现的是边缘路由器的功能。
 
-51、简述Kubernetes镜像的下载策略？
-  K8s的镜像下载策略有三种：Always、Never、IFNotPresent。
+# 简述Kubernetes镜像的下载策略？
+  K8s的镜像下载策略有三种：
 
     Always：镜像标签为latest时，总是从指定的仓库中获取镜像。
     Never：禁止从仓库中下载镜像，也就是说只能使用本地镜像。
@@ -320,13 +321,13 @@
 
   默认的镜像下载策略是：当镜像标签是latest时，默认策略是Always；当镜像标签是自定义时（也就是标签不是latest），那么默认策略是IfNotPresent。
 
-52、简述Kubernetes的负载均衡器？
+# 简述Kubernetes的负载均衡器？
   负载均衡器是暴露服务的最常见和标准方式之一。
 
   根据工作环境使用两种类型的负载均衡器，即内部负载均衡器或外部负载均衡器。内部负载均衡器自动平衡负载并使用所需配置分配容器，而外部负载均衡器将流量从外部负载引导至后端容器。
 
-53、简述Kubernetes各模块如何与API Server通信？
-  Kubernetes API Server作为集群的核心，负责集群各功能模块之间的通信。集群内的各个功能模块通过API Server将信息存入etcd，当需要获取和操作这些数据时，则通过API Server提供  \
+# 简述Kubernetes各模块如何与API Server通信？
+  K8s API Server作为集群的核心，负责集群各功能模块之间的通信。集群内的各个功能模块通过API Server将信息存入etcd，当需要获取和操作这些数据时，则通过API Server提供  \
    的REST接口（用GET、LIST或WATCH方法）来实现，从而实现各模块之间的信息交互。
 
   如kubelet进程与API Server的交互：每个Node上的kubelet每隔一个时间周期，就会调用一次API Server的REST接口报告自身状态，API Server在接收到这些信息后，会将节点状态信息更新到etcd中。
@@ -337,7 +338,7 @@
   如kube-scheduler进程与API Server的交互：Scheduler通过API Server的Watch接口监听到新建Pod副本的信息后，会检索所有符合该Pod要求的Node列表，开始执行Pod调度逻辑，在调度  \
    成功后将Pod绑定到目标节点上。
 
-54、简述Kubernetes Scheduler作用及实现原理？
+# 简述Kubernetes Scheduler作用及实现原理？
   Kubernetes Scheduler是负责Pod调度的重要功能模块，Kubernetes Scheduler在整个系统中承担了“承上启下”的重要功能，“承上”是指它负责接收Controller Manager创建的新Pod，为其  \
    调度至目标Node；“启下”是指调度完成后，目标Node上的kubelet服务进程接管后继工作，负责Pod接下来生命周期。
 
@@ -346,33 +347,31 @@
 
   在整个调度过程中涉及三个对象，分别是待调度Pod列表、可用Node列表，以及调度算法和策略。
 
-  Kubernetes Scheduler通过调度算法调度为待调度Pod列表中的每个Pod从Node列表中选择一个最适合的Node来实现Pod的调度。随后，目标节点上的kubelet通过API Server监听  \
+  K8s Scheduler通过调度算法调度为待调度Pod列表中的每个Pod从Node列表中选择一个最适合的Node来实现Pod的调度。随后，目标节点上的kubelet通过API Server监听  \
    到Kubernetes Scheduler产生的Pod绑定事件，然后获取对应的Pod清单，下载Image镜像并启动容器。
 
-55、简述Kubernetes Scheduler使用哪两种算法将Pod绑定到worker节点？
+# 简述Kubernetes Scheduler使用哪两种算法将Pod绑定到worker节点？
   Kubernetes Scheduler根据如下两种调度算法将 Pod 绑定到最合适的工作节点：
     预选（Predicates）：输入是所有节点，输出是满足预选条件的节点。kube-scheduler根据预选策略过滤掉不满足策略的Nodes。如果某节点的资源不足或者不满足预选策略的条件则无法  \
      通过预选。如“Node的label必须与Pod的Selector一致”。
     优选（Priorities）：输入是预选阶段筛选出的节点，优选会根据优先策略为通过预选的Nodes进行打分排名，选择得分最高的Node。例如，资源越富裕、负载越小的Node可能具有越高的排名。
 
-56、述Kubernetes kubelet的作用？
+# 述Kubernetes kubelet的作用？
   在Kubernetes集群中，在每个Node（又称Worker）上都会启动一个kubelet服务进程。该进程用于处理Master下发到本节点的任务，管理Pod及Pod中的容器。每个kubelet进程都会 \
    在API Server上注册节点自身的信息，定期向Master汇报节点资源的使用情况，并通过cAdvisor监控容器和节点资源。
 
-57、简述Kubernetes kubelet监控Worker节点资源是使用什么组件来实现的？
+# 简述Kubernetes kubelet监控Worker节点资源是使用什么组件来实现的？
   kubelet使用cAdvisor对worker节点资源进行监控。在 Kubernetes 系统中，cAdvisor 已被默认集成到 kubelet 组件内，当 kubelet 服务启动时，它会自动启动 cAdvisor 服务， \
    然后 cAdvisor 会实时采集所在节点的性能指标及在节点上运行的容器的性能指标。
 
-58、简述Kubernetes如何保证集群的安全性？
+# 简述Kubernetes如何保证集群的安全性？
   Kubernetes通过一系列机制来实现集群的安全控制，主要有如下不同的维度：
 
     基础设施方面：保证容器与其所在宿主机的隔离；
 
     权限方面：
-
-    最小权限原则：合理限制所有组件的权限，确保组件只执行它被授权的行为，通过限制单个组件的能力来限制它的权限范围。
-
-    用户权限：划分普通用户和管理员的角色。
+      最小权限原则：合理限制所有组件的权限，确保组件只执行它被授权的行为，通过限制单个组件的能力来限制它的权限范围。
+      用户权限：划分普通用户和管理员的角色。
 
     集群方面：
 
@@ -385,37 +384,29 @@
 
       AdmissionControl（准入机制）：对kubernetes api的请求过程中，顺序为：先经过认证 & 授权，然后执行准入操作，最后对目标对象进行操作。
 
-59、简述Kubernetes准入机制？
+# 简述Kubernetes准入机制？
   在对集群进行请求时，每个准入控制代码都按照一定顺序执行。如果有一个准入控制拒绝了此次请求，那么整个请求的结果将会立即返回，并提示用户相应的error信息。
 
   准入控制（AdmissionControl）准入控制本质上为一段准入代码，在对kubernetes api的请求过程中，顺序为：先经过认证 & 授权，然后执行准入操作，最后对目标对象进行操作。
   常用组件（控制代码）如下：
-
     AlwaysAdmit：允许所有请求
-
     AlwaysDeny：禁止所有请求，多用于测试环境。
-
     ServiceAccount：它将serviceAccounts实现了自动化，它会辅助serviceAccount做一些事情，比如如果pod没有serviceAccount属性，它会自动添加一个default，并确保pod的serviceAccount始终存在。
-
     LimitRanger：观察所有的请求，确保没有违反已经定义好的约束条件，这些条件定义在namespace中LimitRange对象中。
-
     NamespaceExists：观察所有的请求，如果请求尝试创建一个不存在的namespace，则这个请求被拒绝。
 
-60、简述Kubernetes RBAC及其特点（优势）？
+# 简述Kubernetes RBAC及其特点（优势）？
   RBAC是基于角色的访问控制，是一种基于个人用户的角色来管理对计算机或网络资源的访问的方法。
 
   相对于其他授权模式，RBAC具有如下优势：
-
     对集群中的资源和非资源权限均有完整的覆盖。
-
     整个RBAC完全由几个API对象完成， 同其他API对象一样， 可以用kubectl或API进行操作。
-
     可以在运行时进行调整，无须重新启动API Server。
 
-61、简述Kubernetes Secret作用？
+# 简述Kubernetes Secret作用？
   Secret对象，主要作用是保管私密数据，比如密码、OAuth Tokens、SSH Keys等信息。将这些私密信息放在Secret对象中比直接放在Pod或Docker Image中更安全，也更便于使用和分发。
 
-62、简述Kubernetes Secret有哪些使用方式？
+# 简述Kubernetes Secret有哪些使用方式？
   创建完secret之后，可通过如下三种方式使用：
 
     在创建Pod时，通过为Pod指定Service Account来自动使用该Secret。
@@ -424,60 +415,53 @@
 
     在Docker镜像下载时使用，通过指定Pod的spc.ImagePullSecrets来引用它。
 
-63、简述Kubernetes PodSecurityPolicy机制？
+# 简述Kubernetes PodSecurityPolicy机制？
   Kubernetes PodSecurityPolicy是为了更精细地控制Pod对资源的使用方式以及提升安全策略。在开启PodSecurityPolicy准入控制器后，Kubernetes默认不允许创建任何Pod，需要   \
    创建PodSecurityPolicy策略和相应的RBAC授权策略（Authorizing Policies），Pod才能创建成功。
 
-64、简述Kubernetes PodSecurityPolicy机制能实现哪些安全策略？
+# 述Kubernetes PodSecurityPolicy机制能实现哪些安全策略？
   在PodSecurityPolicy对象中可以设置不同字段来控制Pod运行时的各种安全策略
   常见的有：
-
     特权模式：privileged是否允许Pod以特权模式运行。
-
     宿主机资源：控制Pod对宿主机资源的控制，如hostPID：是否允许Pod共享宿主机的进程空间。
-
     用户和组：设置运行容器的用户ID（范围）或组（范围）。
-
     提升权限：AllowPrivilegeEscalation：设置容器内的子进程是否可以提升权限，通常在设置非root用户（MustRunAsNonRoot）时进行设置。
-
     SELinux：进行SELinux的相关配置。
 
-65、简述Kubernetes网络模型？
+# 述Kubernetes网络模型？
   Kubernetes网络模型中每个Pod都拥有一个独立的IP地址，并假定所有Pod都在一个可以直接连通的、扁平的网络空间中。所以不管它们是否运行在同一个Node（宿主机）中，都要求它们可以  \
    直接通过对方的IP进行访问。设计这个原则的原因是，用户不需要额外考虑如何建立Pod之间的连接，也不需要考虑如何将容器端口映射到主机端口等问题。
 
   同时为每个Pod都设置一个IP地址的模型使得同一个Pod内的不同容器会共享同一个网络命名空间，也就是同一个Linux网络协议栈。这就意味着同一个Pod内的容器可以通过localhost来连接对方的端口。
 
-  在Kubernetes的集群里，IP是以Pod为单位进行分配的。一个Pod内部的所有容器共享一个网络堆栈（相当于一个网络命名空间，它们的IP地址、网络设备、配置等都是共享的）。
+  在K8s的集群里，IP是以Pod为单位进行分配的。一个Pod内部的所有容器共享一个网络堆栈（相当于一个网络命名空间，它们的IP地址、网络设备、配置等都是共享的）。
 
-66、简述Kubernetes CNI模型？
+# 述Kubernetes CNI模型？
   CNI提供了一种应用容器的插件化网络解决方案，定义对容器网络进行操作和配置的规范，通过插件的形式对CNI接口进行实现。CNI仅关注在创建容器时分配网络资源，和在销毁  \
-   容器时删除网络资源。在CNI模型中只涉及两个概念：容器和网络。
+   容器时删除网络资源。
+  在CNI模型中只涉及两个概念：容器和网络
+    容器（Container）：是拥有独立Linux网络命名空间的环境，例如使用Docker或rkt创建的容器。容器需要拥有自己的Linux网络命名空间，这是加入网络的必要条件。
+    网络（Network）：表示可以互连的一组实体，这些实体拥有各自独立、唯一的IP地址，可以是容器、物理机或者其他网络设备（比如路由器）等。
 
-  容器（Container）：是拥有独立Linux网络命名空间的环境，例如使用Docker或rkt创建的容器。容器需要拥有自己的Linux网络命名空间，这是加入网络的必要条件。
+  对容器网络的设置和操作都通过插件（Plugin）进行具体实现，CNI插件包括两种类型：【CNI Plugin和IPAM（IP Address  Management）Plugin】
+    CNI Plugin负责为容器配置网络资源
+    IPAM Plugin负责对容器的IP地址进行分配和管理。IPAM Plugin作为CNI Plugin的一部分，与CNI Plugin协同工作。
 
-  网络（Network）：表示可以互连的一组实体，这些实体拥有各自独立、唯一的IP地址，可以是容器、物理机或者其他网络设备（比如路由器）等。
-
-  对容器网络的设置和操作都通过插件（Plugin）进行具体实现，CNI插件包括两种类型：CNI Plugin和IPAM（IP Address  Management）Plugin。CNI Plugin负责为容器配置  \
-   网络资源，IPAM Plugin负责对容器的IP地址进行分配和管理。IPAM Plugin作为CNI Plugin的一部分，与CNI Plugin协同工作。
-
-67、简述Kubernetes网络策略？
-  为实现细粒度的容器间网络访问隔离策略，Kubernetes引入Network Policy。
+# 述Kubernetes网络策略？
+  为实现细粒度的容器间网络访问隔离策略，K8s引入Network Policy。
 
   Network Policy的主要功能是对Pod间的网络通信进行限制和准入控制，设置允许访问或禁止访问的客户端Pod列表。Network Policy定义网络策略，配合策略控制器（Policy Controller）进行策略的实现。
 
-68、简述Kubernetes网络策略原理？
+# 述Kubernetes网络策略原理？
   Network Policy的工作原理主要为：policy controller需要实现一个API Listener，监听用户设置的Network Policy定义，并将网络访问规则通过各Node的Agent进行实际  \
    设置（Agent则需要通过CNI网络插件实现）。
 
-69、简述Kubernetes中flannel的作用？
-  Flannel可以用于Kubernetes底层网络的实现，主要作用有：
+# 述Kubernetes中flannel的作用？
+  Flannel可以用于K8s底层网络的实现，主要作用有：
+    它能协助K8s，给每一个Node上的pod都分配互相不冲突的IP地址。
+    它能在这些IP地址之间建立一个覆盖网络（Overlay Network），通过这个覆盖网络，将数据包原封不动地传递到目标容器内。
 
-  它能协助Kubernetes，给每一个Node上的Docker容器都分配互相不冲突的IP地址。
-
-  它能在这些IP地址之间建立一个覆盖网络（Overlay Network），通过这个覆盖网络，将数据包原封不动地传递到目标容器内。
-
-70、简述Kubernetes Calico网络组件实现原理？
+# 述Kubernetes Calico网络组件实现原理？
   Calico是一个基于BGP的纯三层的网络方案，与OpenStack、Kubernetes、AWS、GCE等云平台都能够良好地集成。
 
   Calico在每个计算节点都利用Linux Kernel实现了一个高效的vRouter来负责数据转发。每个vRouter都通过BGP协议把在本节点上运行的容器的路由信息向整个Calico网络广播，并 \
@@ -486,11 +470,11 @@
   Calico保证所有容器之间的数据流量都是通过IP路由的方式完成互联互通的。Calico节点组网时可以直接利用数据中心的网络结构（L2或者L3），不需要额外的NAT、隧道或者  \
    Overlay Network，没有额外的封包解包，能够节约CPU运算，提高网络效率。
 
-71、简述Kubernetes共享存储的作用？
-  Kubernetes对于有状态的容器应用或者对数据需要持久化的应用，因此需要更加可靠的存储来保存应用产生的重要数据，以便容器应用在重建之后仍然可以使用之前的数据。因此需要使用共享存储。
+# 述Kubernetes共享存储的作用？
+  在K8s存在有状态的容器应用或者对数据需要持久化的应用，因此需要更加可靠的存储来保存应用产生的重要数据，以便容器应用在重建之后仍然可以使用之前的数据，需要使用共享存储。
 
-72、简述Kubernetes数据持久化的方式有哪些？
-  Kubernetes通过数据持久化来持久化保存重要数据，常见的方式有：
+# 述Kubernetes数据持久化的方式有哪些？
+  K8s通过数据持久化来持久化保存重要数据，常见的方式有：
     EmptyDir（空目录）：没有指定要挂载宿主机上的某个目录，直接由Pod内保部映射到宿主机上。类似于docker中的manager volume。
       场景：
         只需要临时将数据保存在磁盘上，比如在合并/排序算法中；
@@ -503,32 +487,32 @@
       特性：增加了pod与节点之间的耦合。
         PersistentVolume（简称PV）：如基于NFS服务的PV，也可以基于GFS的PV。它的作用是统一数据持久化目录，方便管理。
 
-73、简述Kubernetes PV和PVC？
+# 述Kubernetes PV和PVC？
   PV是对底层网络共享存储的抽象，将共享存储定义为一种“资源”。
 
   PVC则是用户对存储资源的一个“申请”。
 
-74、简述Kubernetes PV生命周期内的阶段？
+# 述Kubernetes PV生命周期内的阶段？
   某个PV在生命周期中可能处于以下4个阶段（Phaes）之一。
     Available：可用状态，还未与某个PVC绑定。
     Bound：已与某个PVC绑定。
     Released：绑定的PVC已经删除，资源已释放，但没有被集群回收。
     Failed：自动资源回收失败。
 
-75、简述Kubernetes所支持的存储供应模式？
+# 述Kubernetes所支持的存储供应模式？
   Kubernetes支持两种资源的存储供应模式：静态模式（Static）和动态模式（Dynamic）。
     静态模式：集群管理员手工创建许多PV，在定义PV时需要将后端存储的特性进行设置。
     动态模式：集群管理员无须手工创建PV，而是通过StorageClass的设置对后端存储进行描述，标记为某种类型。此时要求PVC对存储的类型进行声明，系统将自动完成PV的创建及与PVC的绑定。
 
-76、简述Kubernetes CSI模型？
-  Kubernetes CSI是Kubernetes推出与容器对接的存储接口标准，存储提供方只需要基于标准接口进行存储插件的实现，就能使用Kubernetes的原生存储机制为容器提供存储  \
-   服务。CSI使得存储提供方的代码能和Kubernetes代码彻底解耦，部署也与Kubernetes核心组件分离，显然，存储插件的开发由提供方自行维护，就能为Kubernetes用户提供更多的存储功能，也更加安全可靠。
+# 述Kubernetes CSI模型？
+  Kubernetes CSI是K8s推出与容器对接的存储接口标准，存储提供方只需要基于标准接口进行存储插件的实现，就能使用K8s的原生存储机制为容器提供存储  \
+   服务。CSI使得存储提供方的代码能和K8s代码彻底解耦，部署也与K8s核心组件分离，显然，存储插件的开发由提供方自行维护，就能为K8s用户提供更多的存储功能，也更加安全可靠。
 
   CSI包括CSI Controller和CSI Node：
     CSI Controller的主要功能是提供存储服务视角对存储资源和存储卷进行管理和操作。
     CSI Node的主要功能是对主机（Node）上的Volume进行管理和操作。
 
-77、简述Kubernetes Worker节点加入集群的过程？
+# 述Kubernetes Worker节点加入集群的过程？
   通常需要对Worker节点进行扩容，从而将应用系统进行水平扩展。主要过程如下：
 
     1、在该Node上安装Docker、kubelet和kube-proxy服务；
@@ -536,23 +520,23 @@
     3、通过kubelet默认的自动注册机制，新的Worker将会自动加入现有的Kubernetes集群中；
     4、Kubernetes Master在接受了新Worker的注册之后，会自动将其纳入当前集群的调度范围。
 
-78、简述Kubernetes Pod如何实现对节点的资源控制？
-  Kubernetes集群里的节点提供的资源主要是计算资源，计算资源是可计量的能被申请、分配和使用的基础资源。当前Kubernetes集群中的计算资源主要包   \
-   括CPU、GPU及Memory。CPU与Memory是被Pod使用的，因此在配置Pod时可以通过参数CPU Request及Memory Request为其中的每个容器指定所需使用的CPU与Memory量，Kubernetes会  \
+# 述Kubernetes Pod如何实现对节点的资源控制？
+  K8s集群里的节点提供的资源主要是计算资源，计算资源是可计量的能被申请、分配和使用的基础资源。当前K8s集群中的计算资源主要包   \
+   括CPU、GPU及Memory。CPU与Memory是被Pod使用的，因此在配置Pod时可以通过参数CPU Request及Memory Request为其中的每个容器指定所需使用的CPU与Memory量，K8s会  \
    根据Request的值去查找有足够资源的Node来调度此Pod。
 
   通常，一个程序所使用的CPU与Memory是一个动态的量，确切地说，是一个范围，跟它的负载密切相关：负载增加时，CPU和Memory的使用量也会增加。
 
-79、简述Kubernetes Requests和Limits如何影响Pod的调度？
-  当一个Pod创建成功时，Kubernetes调度器（Scheduler）会为该Pod选择一个节点来执行。对于每种计算资源（CPU和Memory）而言，每个节点都有一个能用于运行Pod的最大  \
+# 述Kubernetes Requests和Limits如何影响Pod的调度？
+  当一个Pod创建成功时，K8s调度器（Scheduler）会为该Pod选择一个节点来执行。对于每种计算资源（CPU和Memory）而言，每个节点都有一个能用于运行Pod的最大  \
    容量值。调度器在调度时，首先要确保调度后该节点上所有Pod的CPU和内存的Requests总和，不超过该节点能提供给Pod使用的CPU和Memory的最大容量值。
 
-80、简述Kubernetes Metric Service？
-  在Kubernetes从1.10版本后采用Metrics Server作为默认的性能数据采集和监控，主要用于提供核心指标（Core Metrics），包括Node、Pod的CPU和内存使用指标。对其他  \
+# 述Kubernetes Metric Service？
+  在K8s从1.10版本后采用Metrics Server作为默认的性能数据采集和监控，主要用于提供核心指标（Core Metrics），包括Node、Pod的CPU和内存使用指标。对其他  \
    自定义指标（Custom Metrics）的监控则由Prometheus等组件来完成。
 
-81、简述Kubernetes中，如何使用EFK实现日志的统一管理？
-  在Kubernetes集群环境中，通常一个完整的应用或服务涉及组件过多，建议对日志系统进行集中化管理，通常采用EFK实现。
+# 述Kubernetes中，如何使用EFK实现日志的统一管理？
+  在K8s集群环境中，通常一个完整的应用或服务涉及组件过多，建议对日志系统进行集中化管理，通常采用EFK实现。
 
   EFK是 Elasticsearch、Fluentd 和 Kibana 的组合，其各组件功能如下：
     Elasticsearch：是一个搜索引擎，负责存储日志并提供查询接口；
@@ -561,20 +545,20 @@
   通过在每台node上部署一个以DaemonSet方式运行的fluentd来收集每台node上的日志。Fluentd将docker日志目录/var/lib/docker/containers和/var/log目录   \
    挂载到Pod中，然后Pod会在node节点的/var/log/pods目录中创建新的目录，可以区别不同的容器日志输出，该目录下有一个日志文件链接到/var/lib/docker/contianers目录下的容器日志输出。
 
-82、简述Kubernetes如何进行优雅的节点关机维护？
-  由于Kubernetes节点运行大量Pod，因此在进行关机维护之前，建议先使用kubectl drain将该节点的Pod进行驱逐，然后进行关机维护。
+# 述Kubernetes如何进行优雅的节点关机维护？
+  由于8s节点运行大量Pod，因此在进行关机维护之前，建议先使用kubectl drain将该节点的Pod进行驱逐，然后进行关机维护。
 
-83、简述Kubernetes集群联邦？
-  Kubernetes集群联邦可以将多个Kubernetes集群作为一个集群进行管理。因此，可以在一个数据中心/云中创建多个Kubernetes集群，并使用集群联邦在一个地方控制/管理所有集群。
+# 述Kubernetes集群联邦？
+  K8s集群联邦可以将多个K8s集群作为一个集群进行管理。因此，可以在一个数据中心/云中创建多个Kubernetes集群，并使用集群联邦在一个地方控制/管理所有集群。
 
-84、简述Helm及其优势？
-  Helm 是 Kubernetes 的软件包管理工具。类似 Ubuntu 中使用的apt、Centos中使用的yum 或者Python中的 pip 一样。
+# 述Helm及其优势？
+  Helm 是 Kubernetes 的软件包管理工具。类似于Centos中使用的yum
 
   Helm能够将一组K8S资源打包统一管理, 是查找、共享和使用为Kubernetes构建的软件的最佳方式。
   Helm中通常每个包称为一个Chart，一个Chart是一个目录（一般情况下会将目录进行打包压缩，形成name-version.tgz格式的单一文件，方便传输和存储）。
 
   Helm优势:
-    在 Kubernetes中部署一个可以使用的应用，需要涉及到很多的 Kubernetes 资源的共同协作。使用helm则具有如下优势：
+    在 Kubernetes中部署一个可以使用的应用，需要涉及到很多的 K8s 资源的共同协作。使用helm则具有如下优势：
 
     统一管理、配置和更新这些分散的 k8s 的应用资源文件；
 
