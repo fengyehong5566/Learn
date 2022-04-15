@@ -270,6 +270,32 @@
 
 
 
-
-
+# 附录
+## 对象类型：
+  AF = 聚合函数 (CLR)
+  C = CHECK 约束
+  D = DEFAULT（约束或独立）
+  F = FOREIGN KEY 约束
+  FN = SQL 标量函数
+  FS = 程序集 (CLR) 标量函数
+  FT = 程序集 (CLR) 表值函数
+  IF = SQL 内联表值函数
+  IT = 内部表
+  P = SQL 存储过程
+  PC = 程序集 (CLR) 存储过程
+  PG = 计划指南
+  PK = PRIMARY KEY 约束
+  R = 规则（旧式，独立）
+  RF = 复制筛选过程
+  S = 系统基表
+  SN = 同义词
+  SQ = 服务队列
+  TA = 程序集 (CLR) DML 触发器
+  TF = SQL 表值函数
+  TR = SQL DML 触发器
+  TT = 表类型
+  U = 表（用户定义类型）
+  UQ = UNIQUE 约束
+  V = 视图
+  X = 扩展存储过程
     
