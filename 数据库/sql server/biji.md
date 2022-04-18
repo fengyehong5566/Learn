@@ -104,6 +104,34 @@
   >@@VERSION —— 返回sql server当前安装的日期、版本和处理器类型
   >@@LANGUAGE —— 返回当前sqlserver服务器的语言
 
+## 表变量
+语法：
+```
+declare @varTable  table（
+  var1 type1,
+  var2 type2,
+  ...
+  varn typen
+  )
+
+
+--将数据插入表变量声明后，表变量为空。可以使用INSERT语句将行插入表变量：
+INSERT INTO @product_table
+SELECT
+    column1,
+    column2,
+    ...
+    columnN
+FROM
+    table
+WHERE
+    column = 1;
+
+--查看表变量
+select * from @varTable
+
+```
+
 ## 注释符
   1、--：(双连字符) 单行注释
   2、/*...*/：多行注释
