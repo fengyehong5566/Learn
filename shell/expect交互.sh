@@ -20,3 +20,20 @@ exp_continue    #相当于其他语言的continue，此处用于判断语句，�
 expect eof    #表示结束交互，但会原终端所在位置。
 interact    #与expect eof作用类似，但结束交互后，所处位置为脚本内最后所在位置
 exit    #退出expect脚本
+
+
+
+
+#!/bin/bash
+ip=$1
+password=$2
+autologin(){
+expect -c "
+set timeout 5
+spawn ssh root@$1 -p22
+expect {
+“yes/no” {send “yes”\r;exp_continue}
+“password” {send $2\r}
+}
+interact"
+}
